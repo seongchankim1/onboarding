@@ -1,5 +1,8 @@
 package com.seongchan.onboarding.dto;
 
+import lombok.Getter;
+
+@Getter
 public class HttpResponseDto {
 
 	private Integer statusCode;
