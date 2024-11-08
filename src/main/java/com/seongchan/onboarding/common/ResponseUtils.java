@@ -3,6 +3,7 @@ package com.seongchan.onboarding.common;
 import org.springframework.http.ResponseEntity;
 
 import com.seongchan.onboarding.dto.HttpResponseDto;
+import com.seongchan.onboarding.exception.ResponseExceptionEnum;
 
 public class ResponseUtils {
 
