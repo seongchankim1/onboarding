@@ -66,11 +66,13 @@ public class WebSecurityConfig {
 			sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 		);
 
-		http.authorizeHttpRequests((authorizeHttpRequests) -> authorizeHttpRequests
+		http.authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
+			.requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
 			.requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
 			.requestMatchers("/signup", "/sign").permitAll()
 			.anyRequest().authenticated()
 		);
+
 
 		// 필터 관리
 		http.addFilterBefore(jwtAuthorizationFilter(), JwtAuthenticationFilter.class);

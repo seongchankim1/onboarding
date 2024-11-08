@@ -25,6 +25,9 @@ public class UserController {
 		return userService.signup(requestDto);
 	}
 
+	/**
+	 * 인증 인가 성공 시 볼 수 있는 메서드
+	 */
 	@GetMapping("/test")
 	public String test() {
 		return userService.test();
