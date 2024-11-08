@@ -4,6 +4,7 @@ package com.seongchan.onboarding.security.filters;
 import static jakarta.servlet.http.HttpServletResponse.SC_OK;
 
 import java.io.IOException;
+import java.util.Set;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -14,6 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.seongchan.onboarding.common.RedisService;
 import com.seongchan.onboarding.dto.HttpResponseDto;
 import com.seongchan.onboarding.dto.LoginRequestDto;
+import com.seongchan.onboarding.dto.LoginResponseDto;
 import com.seongchan.onboarding.entity.UserRole;
 import com.seongchan.onboarding.security.JwtProvider;
 import com.seongchan.onboarding.security.UserDetailsImpl;
@@ -33,7 +35,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     public JwtAuthenticationFilter(JwtProvider jwtProvider, RedisService redisService) {
         this.jwtProvider = jwtProvider;
 		this.redisService = redisService;
-		setFilterProcessesUrl("/login"); // 로그인 경로 설정
+		setFilterProcessesUrl("/sign"); // 로그인 경로 설정
     }
 
 
@@ -59,13 +61,13 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     @Override
     protected void successfulAuthentication(HttpServletRequest req, HttpServletResponse res,
-            FilterChain chain, Authentication authResult) throws IOException {
+        FilterChain chain, Authentication authResult) throws IOException {
         log.info("인증 성공 및 JWT 생성");
         String username = ((UserDetailsImpl) authResult.getPrincipal()).getUsername();
-        UserRole role = ((UserDetailsImpl) authResult.getPrincipal()).getUser().getAuthorities();
+        Set<UserRole> roles = ((UserDetailsImpl) authResult.getPrincipal()).getUser().getAuthorities();
 
-        String accessToken = jwtProvider.createAccessToken(username, role);
-        String refreshToken = jwtProvider.createRefreshToken(username, role);
+        String accessToken = jwtProvider.createAccessToken(username, roles); // Set<UserRole> 전달
+        String refreshToken = jwtProvider.createRefreshToken(username, roles);
 
         res.setHeader(AUTHORIZATION_HEADER, accessToken);
         redisService.saveRefreshToken(username, refreshToken);
@@ -74,9 +76,10 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         res.setCharacterEncoding("UTF-8");
         res.setContentType("application/json");
 
-        String jsonResponse = new ObjectMapper().writeValueAsString(new HttpResponseDto(SC_OK, "로그인 성공", accessToken));
+        String jsonResponse = new ObjectMapper().writeValueAsString(new LoginResponseDto(accessToken));
         res.getWriter().write(jsonResponse);
     }
+
 
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest req, HttpServletResponse res, AuthenticationException failed) throws IOException {

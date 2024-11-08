@@ -2,7 +2,10 @@ package com.seongchan.onboarding.security;
 
 import java.security.Key;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.Date;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 
@@ -65,22 +68,27 @@ public class JwtProvider {
     /**
      * Access 토큰 생성
      */
-    public String createAccessToken(String username, UserRole role) {
+    public String createAccessToken(String username, Set<UserRole> roles) {
         Date date = new Date();
 
+        String roleNames = roles.stream()
+            .map(UserRole::name)
+            .collect(Collectors.joining(","));
+
         return BEARER_PREFIX + Jwts.builder()
-                .setSubject(username)
-                .claim(AUTHORIZATION_KEY, role)
-                .setExpiration(new Date(date.getTime() + ACCESS_TOKEN_TIME))
-                .setIssuedAt(date) // 발급일
-                .signWith(key, SignatureAlgorithm.HS256)
-                .compact();
+            .setSubject(username)
+            .claim(AUTHORIZATION_KEY, roleNames)  // 문자열로 권한 저장
+            .setExpiration(new Date(date.getTime() + ACCESS_TOKEN_TIME))
+            .setIssuedAt(date) // 발급일
+            .signWith(key, SignatureAlgorithm.HS256)
+            .compact();
     }
+
 
     /**
      * Refresh 토큰 생성
      */
-    public String createRefreshToken(String username, UserRole role) {
+    public String createRefreshToken(String username, Set<UserRole> role) {
         Date date = new Date();
 
         return BEARER_PREFIX + Jwts.builder()
@@ -158,11 +166,11 @@ public class JwtProvider {
     /**
      * 토큰에서 role 가져오기
      */
-    public UserRole getRoleFromToken(String token) {
+    public Set<UserRole> getRoleFromToken(String token) {
         Claims claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token)
                 .getBody();
         String role = claims.get(AUTHORIZATION_KEY, String.class);
-        return UserRole.valueOf(role);
+        return Collections.singleton(UserRole.valueOf(role));
     }
 
     public String substringToken(String tokenValue) {

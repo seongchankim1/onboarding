@@ -1,6 +1,7 @@
 package com.seongchan.onboarding.security.filters;
 
 import java.io.IOException;
+import java.util.Set;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -83,7 +84,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 	}
 
 	private void updateToken(String token, String username, HttpServletResponse res) throws IOException {
-		UserRole role = jwtProvider.getRoleFromToken(token);
+		Set<UserRole> role = jwtProvider.getRoleFromToken(token);
 		String newAccessToken = jwtProvider.createAccessToken(username, role);
 
 		res.setHeader(AUTHORIZATION_HEADER, newAccessToken);

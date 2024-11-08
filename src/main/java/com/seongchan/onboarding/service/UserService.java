@@ -1,10 +1,16 @@
 package com.seongchan.onboarding.service;
 
-import org.springframework.http.ResponseEntity;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.seongchan.onboarding.dto.AuthorityDto;
 import com.seongchan.onboarding.dto.SignupRequestDto;
+import com.seongchan.onboarding.dto.SignupResponseDto;
 import com.seongchan.onboarding.entity.User;
 import com.seongchan.onboarding.entity.UserRole;
 import com.seongchan.onboarding.exception.ResponseExceptionEnum;
@@ -20,7 +26,7 @@ public class UserService {
 	private final PasswordEncoder passwordEncoder;
 	private final UserRepository userRepository;
 
-	public String signup(SignupRequestDto requestDto) {
+	public SignupResponseDto signup(SignupRequestDto requestDto) {
 
 		if (userRepository.existsByUsername(requestDto.getUsername())) {
 			throw new UserAlreadyExistsException(ResponseExceptionEnum.USER_ALREADY_EXISTS);
@@ -28,18 +34,25 @@ public class UserService {
 
 		String username = requestDto.getUsername();
 		String password = passwordEncoder.encode(requestDto.getPassword());
-		String name = requestDto.getNickname();
+		String nickname = requestDto.getNickname();
+		Set<UserRole> roles = Collections.singleton(UserRole.ROLE_USER);
 
-		User user = User.builder().
-			username(username).
-			password(password).
-			name(name).
-			authorities(UserRole.User).
-			build();
+		User user = User.builder()
+			.username(username)
+			.password(password)
+			.nickname(nickname)
+			.authorities(roles)
+			.build();
+
 		userRepository.save(user);
 
-		return username;
+		List<AuthorityDto> authorityDtos = roles.stream()
+			.map(AuthorityDto::new)
+			.collect(Collectors.toList());
+
+		return new SignupResponseDto(username, nickname, authorityDtos);
 	}
+
 
 	public String test() {
 		return "인증 인가 성공했다면 이 메세지를 볼 수 있습니다!";
