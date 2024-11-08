@@ -2,10 +2,12 @@ package com.seongchan.onboarding.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.seongchan.onboarding.common.ResponseCodeEnum.TEST_SUCCESS;
 import static com.seongchan.onboarding.common.ResponseCodeEnum.USER_SIGNUP_SUCCESS;
 import static com.seongchan.onboarding.common.ResponseUtils.of;
 
@@ -28,5 +30,10 @@ public class UserController {
 	) {
 		String username = userService.signup(requestDto);
 		return of(USER_SIGNUP_SUCCESS, username);
+	}
+
+	@GetMapping("/test")
+	public ResponseEntity<HttpResponseDto> test() {
+		return of(TEST_SUCCESS, userService.test());
 	}
 }

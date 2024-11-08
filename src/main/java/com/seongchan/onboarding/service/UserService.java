@@ -41,4 +41,8 @@ public class UserService {
 		return username;
 	}
 
+	public String test() {
+		return "인증 인가 성공했다면 이 메세지를 볼 수 있습니다!";
+	}
+
 }

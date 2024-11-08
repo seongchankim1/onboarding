@@ -1,7 +1,5 @@
 package com.seongchan.onboarding.security.filters;
 
-
-
 import java.io.IOException;
 
 import org.springframework.http.HttpStatus;
@@ -49,8 +47,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 				updateToken(accessToken, username, res);
 			} else if (jwtProvider.hasRefreshToken(username)) {
 				String refreshToken = jwtProvider.substringToken(redisService.getUsername(username));
-					updateToken(refreshToken, username, res);
-					log.info("토큰 Refresh 성공");
+				updateToken(refreshToken, username, res);
+				log.info("토큰 Refresh 성공");
 			} else {
 				jwtExceptionHandler(res, HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다.");
 				return;
@@ -91,7 +89,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 		res.setHeader(AUTHORIZATION_HEADER, newAccessToken);
 		setAuthentication(jwtProvider.getUsernameFromToken(newAccessToken));
 
-		String jsonResponse = new ObjectMapper().writeValueAsString(
+		new ObjectMapper().writeValueAsString(
 			new HttpResponseDto(HttpStatus.OK.value(), "토큰 갱신 성공", newAccessToken)
 		);
 	}
