@@ -14,6 +14,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.seongchan.onboarding.common.RedisService;
 import com.seongchan.onboarding.dto.HttpResponseDto;
 import com.seongchan.onboarding.entity.UserRole;
 import com.seongchan.onboarding.security.JwtProvider;
@@ -33,15 +34,11 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
 	private final JwtProvider jwtProvider;
 	private final UserDetailsServiceImpl userDetailsService;
+	private final RedisService redisService;
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain filterChain)
 		throws ServletException, IOException {
-
-		if (req.getRequestURI().equals("/signup")) {
-			filterChain.doFilter(req, res);
-			return;
-		}
 
 		String accessToken = jwtProvider.getAccessTokenFromHeader(req);
 		String username = jwtProvider.getUsernameFromToken(accessToken);
@@ -51,8 +48,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 				log.info("액세스 토큰 검증 성공");
 				updateToken(accessToken, username, res);
 			} else if (jwtProvider.hasRefreshToken(username)) {
-				// String refreshToken = jwtProvider.substringToken(redisTemplate.opsForValue().get(username));
-				// 	updateToken(refreshToken, username, res);
+				String refreshToken = jwtProvider.substringToken(redisService.getUsername(username));
+					updateToken(refreshToken, username, res);
 					log.info("토큰 Refresh 성공");
 			} else {
 				jwtExceptionHandler(res, HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다.");

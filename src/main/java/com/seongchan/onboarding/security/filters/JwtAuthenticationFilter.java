@@ -6,12 +6,14 @@ import static jakarta.servlet.http.HttpServletResponse.SC_OK;
 import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.seongchan.onboarding.common.RedisService;
 import com.seongchan.onboarding.dto.HttpResponseDto;
 import com.seongchan.onboarding.dto.LoginRequestDto;
 import com.seongchan.onboarding.entity.UserRole;
@@ -26,11 +28,18 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@RequiredArgsConstructor
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     public static final String AUTHORIZATION_HEADER = "Authorization";
 
     private final JwtProvider jwtProvider;
+    private final RedisService redisService;
+
+    public JwtAuthenticationFilter(JwtProvider jwtProvider, RedisService redisService) {
+        this.jwtProvider = jwtProvider;
+		this.redisService = redisService;
+		setFilterProcessesUrl("/login"); // 로그인 경로 설정
+    }
+
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest req, HttpServletResponse res) throws AuthenticationException {
@@ -63,8 +72,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         String refreshToken = jwtProvider.createRefreshToken(username, role);
 
         res.setHeader(AUTHORIZATION_HEADER, accessToken);
-        // Redis에 RefreshToken 저장
-        // redisService.saveRefreshToken(username, refreshToken);
+        redisService.saveRefreshToken(username, refreshToken);
 
         res.setStatus(SC_OK);
         res.setCharacterEncoding("UTF-8");

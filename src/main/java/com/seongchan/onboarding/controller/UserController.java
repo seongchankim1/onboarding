@@ -22,7 +22,7 @@ public class UserController {
 
 	private final UserService userService;
 
-	@PostMapping
+	@PostMapping("/signup")
 	public ResponseEntity<HttpResponseDto> signup(
 		@RequestBody SignupRequestDto requestDto
 	) {

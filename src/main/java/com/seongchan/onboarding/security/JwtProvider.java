@@ -6,6 +6,7 @@ import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Value;
 
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -37,13 +38,13 @@ public class JwtProvider {
     public static final String AUTHORIZATION_KEY = "auth";
 
     public static final Long REFRESH_TOKEN_TIME = 14 * 24 * 60 * 60 * 1000L; // 2주
-    public static final Long ACCESS_TOKEN_TIME = 1000L; // 1초
-
+    public static final Long ACCESS_TOKEN_TIME = 30 * 60 * 1000L; // 30분
 
     @Value("${jwt-secret-key}")
     private String secretKey;
 
     private Key key;
+    private final RedisTemplate<String, String> redisTemplate;
 
     /**
      * 쿠키 무효화
@@ -127,9 +128,9 @@ public class JwtProvider {
      * Refresh 토큰 검증
      */
     public boolean hasRefreshToken(String username) {
-        // redis에서 토큰에 맞는 키가 존재하면 true
-        // return Boolean.TRUE.equals(redisTemplate.hasKey(username));
-        return true;
+
+        return Boolean.TRUE.equals(redisTemplate.hasKey(username));
+
     }
 
     /**

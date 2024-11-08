@@ -1,9 +1,10 @@
-package com.seongchan.onboarding.common;
+package com.seongchan.onboarding.security;
 
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -16,9 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.seongchan.onboarding.repository.UserRepository;
-import com.seongchan.onboarding.security.JwtProvider;
-import com.seongchan.onboarding.security.UserDetailsServiceImpl;
+import com.seongchan.onboarding.common.RedisService;
 import com.seongchan.onboarding.security.filters.JwtAuthenticationFilter;
 import com.seongchan.onboarding.security.filters.JwtAuthorizationFilter;
 
@@ -32,8 +31,9 @@ public class WebSecurityConfig {
 	private final JwtProvider jwtProvider;
 	private final UserDetailsServiceImpl userDetailsService;
 	private final AuthenticationConfiguration authenticationConfiguration;
+	private final RedisService redisService;
 
-		@Bean
+	@Bean
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
@@ -46,14 +46,14 @@ public class WebSecurityConfig {
 
 	@Bean
 	public JwtAuthenticationFilter jwtAuthenticationFilter() throws Exception {
-		JwtAuthenticationFilter filter = new JwtAuthenticationFilter(jwtProvider);
+		JwtAuthenticationFilter filter = new JwtAuthenticationFilter(jwtProvider, redisService);
 		filter.setAuthenticationManager(authenticationManager(authenticationConfiguration));
 		return filter;
 	}
 
 	@Bean
 	public JwtAuthorizationFilter jwtAuthorizationFilter() {
-		return new JwtAuthorizationFilter(jwtProvider, userDetailsService);
+		return new JwtAuthorizationFilter(jwtProvider, userDetailsService, redisService);
 	}
 
 	@Bean
@@ -68,7 +68,7 @@ public class WebSecurityConfig {
 
 		http.authorizeHttpRequests((authorizeHttpRequests) -> authorizeHttpRequests
 			.requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
-			.requestMatchers(HttpMethod.POST, "/signup").permitAll()
+			.requestMatchers("/signup", "/login").permitAll()
 			.requestMatchers("/**").permitAll()
 			.anyRequest().authenticated()
 		);
