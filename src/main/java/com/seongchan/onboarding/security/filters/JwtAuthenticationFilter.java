@@ -5,8 +5,6 @@ import static jakarta.servlet.http.HttpServletResponse.SC_OK;
 
 import java.io.IOException;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -17,14 +15,12 @@ import com.seongchan.onboarding.common.RedisService;
 import com.seongchan.onboarding.dto.HttpResponseDto;
 import com.seongchan.onboarding.dto.LoginRequestDto;
 import com.seongchan.onboarding.entity.UserRole;
-import com.seongchan.onboarding.repository.UserRepository;
 import com.seongchan.onboarding.security.JwtProvider;
 import com.seongchan.onboarding.security.UserDetailsImpl;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -66,7 +62,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             FilterChain chain, Authentication authResult) throws IOException {
         log.info("인증 성공 및 JWT 생성");
         String username = ((UserDetailsImpl) authResult.getPrincipal()).getUsername();
-        UserRole role = ((UserDetailsImpl) authResult.getPrincipal()).getUser().getUserRole();
+        UserRole role = ((UserDetailsImpl) authResult.getPrincipal()).getUser().getAuthorities();
 
         String accessToken = jwtProvider.createAccessToken(username, role);
         String refreshToken = jwtProvider.createRefreshToken(username, role);

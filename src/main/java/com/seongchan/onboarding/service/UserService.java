@@ -28,13 +28,13 @@ public class UserService {
 
 		String username = requestDto.getUsername();
 		String password = passwordEncoder.encode(requestDto.getPassword());
-		String name = requestDto.getName();
+		String name = requestDto.getNickname();
 
 		User user = User.builder().
 			username(username).
 			password(password).
 			name(name).
-			userRole(UserRole.User).
+			authorities(UserRole.User).
 			build();
 		userRepository.save(user);
 

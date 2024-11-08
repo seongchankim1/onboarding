@@ -13,7 +13,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Getter
@@ -35,21 +34,21 @@ public class User extends TimeStamp {
 	private String password;
 
 	@Column(nullable = false)
-	private String name;
+	private String nickname;
 
 	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
-	private UserRole userRole;
+	private UserRole authorities;
 
 	/**
 	 * 생성자 - 약속된 형태로만 생성가능하도록 합니다.
 	 */
 	@Builder
-	public User(String username, String password, String name, UserRole userRole) {
+	public User(String username, String password, String name, UserRole authorities) {
 		this.username = username;
 		this.password = password;
-		this.name = name;
-		this.userRole = userRole;
+		this.nickname = name;
+		this.authorities = authorities;
 	}
 
 	/**
