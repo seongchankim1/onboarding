@@ -1,8 +1,11 @@
 package com.seongchan.onboarding;
 
+import com.seongchan.onboarding.entity.User;
 import com.seongchan.onboarding.entity.UserRole;
+import com.seongchan.onboarding.repository.UserRepository;
 import com.seongchan.onboarding.security.JwtProvider;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +22,9 @@ class JwtProviderTest {
 
 	@Autowired
 	private JwtProvider jwtProvider;
+
+	@Autowired
+	private UserRepository userRepository;
 
 	private String username;
 	private Set<UserRole> roles;

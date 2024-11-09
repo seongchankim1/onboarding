@@ -12,6 +12,7 @@ import com.seongchan.onboarding.exception.UserAlreadyExistsException;
 import com.seongchan.onboarding.repository.UserRepository;
 import com.seongchan.onboarding.service.UserService;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +46,12 @@ class UserServiceTest {
 		signupRequestDto.setUsername("testuser");
 		signupRequestDto.setPassword("password");
 		signupRequestDto.setNickname("Tester");
+	}
+
+	@AfterEach
+	void tearDown() {
+		User user = userRepository.findByUsername("testuser");
+		userRepository.delete(user);
 	}
 
 	@Test

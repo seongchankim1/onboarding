@@ -3,6 +3,7 @@ package com.seongchan.onboarding;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.seongchan.onboarding.dto.LoginRequestDto;
 import com.seongchan.onboarding.dto.SignupRequestDto;
+import com.seongchan.onboarding.entity.User;
 import com.seongchan.onboarding.repository.UserRepository;
 
 import org.junit.jupiter.api.AfterEach;
@@ -37,11 +38,6 @@ class TotalTest {
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 
-	@AfterEach
-	void tearDown() {
-		userRepository.deleteAll();
-	}
-
 	@Test
 	void testSignupAndLoginAndAccessProtectedEndpoint() throws Exception {
 		// 회원가입
@@ -74,5 +70,8 @@ class TotalTest {
 				.header("Authorization", accessToken))
 			.andExpect(status().isOk())
 			.andExpect(content().string("인증 인가 성공했다면 이 메세지를 볼 수 있습니다!"));
+
+		User user = userRepository.findByUsername("testuser");
+		userRepository.delete(user);
 	}
 }

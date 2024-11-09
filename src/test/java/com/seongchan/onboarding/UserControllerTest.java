@@ -3,7 +3,11 @@ package com.seongchan.onboarding;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.seongchan.onboarding.dto.SignupRequestDto;
 import com.seongchan.onboarding.dto.SignupResponseDto;
+import com.seongchan.onboarding.entity.User;
+import com.seongchan.onboarding.repository.UserRepository;
 import com.seongchan.onboarding.service.UserService;
+
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -26,6 +30,9 @@ class UserControllerTest {
 
 	@Autowired
 	private MockMvc mockMvc;
+
+	@Autowired
+	private UserRepository userRepository;
 
 	@MockBean
 	private UserService userService;
@@ -53,6 +60,9 @@ class UserControllerTest {
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.username").value("testuser"))
 			.andExpect(jsonPath("$.nickname").value("Tester"));
+
+		User user = userRepository.findByUsername("testuser");
+		userRepository.delete(user);
 	}
 
 	@Test
