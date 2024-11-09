@@ -1,5 +1,7 @@
 package com.seongchan.onboarding.security;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.security.Key;
 import java.util.Base64;
 import java.util.Collections;
@@ -187,7 +189,9 @@ public class JwtProvider {
 		throw new IllegalArgumentException("토큰에서 역할을 찾을 수 없습니다.");
 	}
 
-
+	/**
+	 * 토큰에서 Bearer 뺀 글 추출
+	 */
 	public String substringToken(String tokenValue) {
 		if (StringUtils.hasText(tokenValue) && tokenValue.startsWith(BEARER_PREFIX)) {
 			return tokenValue.substring(BEARER_PREFIX.length());
@@ -195,5 +199,38 @@ public class JwtProvider {
 			return tokenValue;
 		}
 		throw new NullPointerException("토큰이 없습니다.");
+	}
+
+	/**
+	 * 쿠키에 JWT 추가
+	 */
+	public void addJwtToCookie(String token, HttpServletResponse res) {
+		try {
+			token = URLEncoder.encode(token, "utf-8").replaceAll("\\+", "%20");
+
+			Cookie cookie = new Cookie(AUTHORIZATION_HEADER, token);
+			cookie.setPath("/");
+
+			res.addCookie(cookie);
+		} catch (UnsupportedEncodingException e) {
+			System.out.println("error");
+		}
+	}
+
+	/**
+	 * 쿠키에서 토큰 추출
+	 */
+	public String resolveTokenFromCookies(HttpServletRequest request) {
+		if (request.getCookies() != null) {
+			for (Cookie cookie : request.getCookies()) {
+				if (AUTHORIZATION_HEADER.equals(cookie.getName())) {
+					String token = cookie.getValue();
+					// %20을 공백으로 변환
+					token = token.replace("%20", " ");
+					return substringToken(token);
+				}
+			}
+		}
+		return null;
 	}
 }
