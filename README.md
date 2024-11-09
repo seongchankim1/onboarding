@@ -33,5 +33,5 @@
 ![img_1.png](src/main/resources/templates/images/img_7.png)
 ![img_2.png](src/main/resources/templates/images/img_8.png)
 
-**패스워드는 암호화되니 안심하고 테스트하세요!**
+### 패스워드는 암호화되니 안심하고 테스트하세요!
 ![img.png](src/main/resources/templates/images/img_9.png)
