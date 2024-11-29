@@ -12,9 +12,13 @@ export const routes = [
     element: <Profile />,
   },
   {
-    name: "Docs",
-    href: "https://www.material-tailwind.com/docs/react/installation",
-    target: "_blank",
+    name: "TBU",
+    path: "/profile",
+    element: "",
+  },
+  {
+    name: "Agents",
+    path: "/profile",
     element: "",
   },
 ];
