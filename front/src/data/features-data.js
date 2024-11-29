@@ -1,28 +1,25 @@
-import {
-  ChatBubbleBottomCenterTextIcon,
-} from "@heroicons/react/24/solid";
+import tailwindBlackIcon from "C:/Users/minie/IdeaProjects/onboarding/front/src/assets/icons/black/tailwind-black.png";
+import spycamBlackIcon from "C:/Users/minie/IdeaProjects/onboarding/front/src/assets/icons/black/spycam-black.png";
+import resurrectionBlackIcon from "C:/Users/minie/IdeaProjects/onboarding/front/src/assets/icons/black/resurrection-black.png";
 
 export const featuresData = [
   {
     color: "gray",
     title: "최신 패치 내역",
-    icon: ChatBubbleBottomCenterTextIcon,
-    description:
-      "9.11 패치 내역",
+    icon: tailwindBlackIcon,
+    description: "9.11 패치 내역",
   },
   {
     color: "gray",
     title: "패치 예정",
-    icon: ChatBubbleBottomCenterTextIcon,
-    description:
-      "업데이트 예정된 항목",
+    icon: spycamBlackIcon,
+    description: "업데이트 예정된 항목",
   },
   {
     color: "gray",
     title: "요원별 업데이트",
-    icon: ChatBubbleBottomCenterTextIcon,
-    description:
-      "요원별 업데이트 기록",
+    icon: resurrectionBlackIcon,
+    description: "요원별 업데이트 기록",
   },
 ];
 
