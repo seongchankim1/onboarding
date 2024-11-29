@@ -17,23 +17,8 @@ public class PageController {
 
 	private final JwtProvider jwtProvider;
 
-	@GetMapping("/")
-	public void getLoginOrIndexPage(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		String token = jwtProvider.resolveTokenFromCookies(request);
-		if (jwtProvider.validateAccessToken(token)) {
-			response.sendRedirect("/index");
-		} else {
-			response.sendRedirect("/login");
-		}
-	}
-
-	@GetMapping("/login")
-	public String login() {
-		return "login"; // templates/login.html을 반환
-	}
-
-	@GetMapping("/index")
+	@GetMapping("/{path:[^\\.]*}")
 	public String index() {
-		return "index"; // templates/login.html을 반환
+		return "forward:/index.html";
 	}
 }

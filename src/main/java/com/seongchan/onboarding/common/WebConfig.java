@@ -16,6 +16,7 @@ public class WebConfig {
 				// 모든 경로에 대해 CORS 허용
 				registry.addMapping("/**")
 					.allowedOrigins("http://localhost:8080") // 프론트엔드 호스트
+					.allowedOrigins("http://localhost:5173")
 					.allowedMethods("*")
 					.allowedHeaders("*")
 					.exposedHeaders("Authorization") // 응답 헤더 중 Authorization 헤더를 노출
