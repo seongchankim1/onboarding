@@ -1,6 +1,5 @@
 import { Home, Profile, SignIn, SignUp } from "@/pages";
-import BoardPage from "@/pages/boardpage.jsx";
-import PatchNoteCreate from "@/pages/PatchNoteCreate";
+import PatchNotesPage from "@/pages/PatchNotesPage"; // 패치 노트 페이지 컴포넌트 가져오기
 
 export const routes = [
   {
@@ -9,29 +8,19 @@ export const routes = [
     element: <Home />,
   },
   {
-    name: "PatchNotes",
-    path: "/patch-notes",
-    element: <BoardPage />, // 패치노트 게시판 경로 추가
+    name: "Latest", // "패치 내역" 경로
+    path: "/latest-patch",
+    element: <PatchNotesPage initialSection="latestPatch" />, // 초기 섹션 설정
   },
   {
-    name: "CreatePatchNote",
-    path: "/patch-notes/create",
-    element: <PatchNoteCreate />, // 패치노트 작성 페이지 경로 추가
+    name: "Upcoming", // "패치 예정" 경로
+    path: "/upcoming-patch",
+    element: <PatchNotesPage initialSection="upcomingPatch" />, // 초기 섹션 설정
   },
   {
-    name: "Profile",
-    path: "/profile",
-    element: <Profile />,
-  },
-  {
-    name: "Signin",
-    path: "/sign-in",
-    element: <SignIn />,
-  },
-  {
-    name: "Signup",
-    path: "/sign-up",
-    element: <SignUp />,
+    name: "Agents", // "요원별 업데이트" 경로
+    path: "/agent-updates",
+    element: <PatchNotesPage initialSection="agentUpdates" />, // 초기 섹션 설정
   },
 ];
 
