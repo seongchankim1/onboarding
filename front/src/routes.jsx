@@ -21,6 +21,16 @@ export const routes = [
     path: "/profile",
     element: "",
   },
+  {
+    name: "Signin",
+    path: "/sign-in",
+    element: <SignIn />,
+  },
+  {
+    name: "Signup",
+    path: "/sign-up",
+    element: <SignUp />,
+  },
 ];
 
 export default routes;
