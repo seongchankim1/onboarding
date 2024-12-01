@@ -30,8 +30,10 @@ public class Agent {
 	private String agentName;
 
 	@ManyToOne
-	@JoinColumn(name = "patch_id", nullable = false)
-	private Patch patch;
+	@JoinColumn(name = "note_id", nullable = false)
+	private Note note;
 
+	@OneToMany(mappedBy = "agent", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<Note> notes = new ArrayList<>();
 
 }
