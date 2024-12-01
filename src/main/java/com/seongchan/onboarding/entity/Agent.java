@@ -1,39 +1,16 @@
 package com.seongchan.onboarding.entity;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
-@Entity
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Agent {
+@RequiredArgsConstructor
+public enum Agent {
+PHOENIX("피닉스"),
+NEON("네온"),
+JETT("제트"),
+SOVA("소바");
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(nullable = false, unique = true)
-	private Long id;
-
-	@Column(nullable = false, unique = true)
-	private String agentName;
-
-	@ManyToOne
-	@JoinColumn(name = "note_id", nullable = false)
-	private Note note;
-
-	@OneToMany(mappedBy = "agent", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<Note> notes = new ArrayList<>();
-
+	private final String koreanName;
 }
+

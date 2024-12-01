@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.seongchan.onboarding.dto.SignupRequestDto;
 import com.seongchan.onboarding.dto.SignupResponseDto;
 import com.seongchan.onboarding.entity.User;
+import com.seongchan.onboarding.entity.UserRole;
 import com.seongchan.onboarding.repository.UserRepository;
 import com.seongchan.onboarding.service.UserService;
 
@@ -48,7 +49,7 @@ class UserControllerTest {
 		SignupResponseDto responseDto = new SignupResponseDto(
 			"testuser",
 			"Tester",
-			Collections.emptyList()
+			UserRole.ROLE_USER
 		);
 
 		when(userService.signup(any(SignupRequestDto.class))).thenReturn(responseDto);

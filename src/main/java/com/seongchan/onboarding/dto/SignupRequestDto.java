@@ -12,5 +12,5 @@ public class SignupRequestDto {
 	private String username;
 	private String password;
 	private String nickname;
-	private UserRole authorities;
+	private UserRole userRole;
 }

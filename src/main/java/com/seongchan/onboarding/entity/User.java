@@ -25,7 +25,6 @@ public class User extends TimeStamp {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(nullable = false, unique = true)
 	private Long id;
 
 	@Column(nullable = false, unique = true)
@@ -37,16 +36,13 @@ public class User extends TimeStamp {
 	@Column(nullable = false)
 	private String nickname;
 
-	@ElementCollection(targetClass = UserRole.class, fetch = FetchType.EAGER)
-	@CollectionTable(name = "user_authorities", joinColumns = @JoinColumn(name = "user_id"))
-	@Enumerated(EnumType.STRING)
-	private Set<UserRole> authorities;
+	private UserRole userRole;
 
 	@Builder
-	public User(String username, String password, String nickname, Set<UserRole> authorities) {
+	public User(String username, String password, String nickname, UserRole userRole) {
 		this.username = username;
 		this.password = password;
 		this.nickname = nickname;
-		this.authorities = authorities;
+		this.userRole = userRole;
 	}
 }

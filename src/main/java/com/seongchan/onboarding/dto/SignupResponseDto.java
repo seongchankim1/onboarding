@@ -1,6 +1,9 @@
 package com.seongchan.onboarding.dto;
 
 import java.util.List;
+
+import com.seongchan.onboarding.entity.UserRole;
+
 import lombok.Getter;
 
 @Getter
@@ -8,11 +11,11 @@ public class SignupResponseDto {
 
 	private String username;
 	private String nickname;
-	private List<AuthorityDto> authorities;
+	private UserRole userRole;
 
-	public SignupResponseDto(String username, String nickname, List<AuthorityDto> authorities) {
+	public SignupResponseDto(String username, String nickname, UserRole userRole) {
 		this.username = username;
 		this.nickname = nickname;
-		this.authorities = authorities;
+		this.userRole = userRole;
 	}
 }

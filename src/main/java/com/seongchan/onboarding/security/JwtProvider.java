@@ -4,7 +4,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.security.Key;
 import java.util.Base64;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -70,16 +69,12 @@ public class JwtProvider {
 	/**
 	 * Access 토큰 생성
 	 */
-	public String createAccessToken(String username, Set<UserRole> roles) {
+	public String createAccessToken(String username, UserRole role) {
 		Date date = new Date();
-
-		List<String> roleNames = roles.stream()
-			.map(UserRole::name)
-			.collect(Collectors.toList());
 
 		return BEARER_PREFIX + Jwts.builder()
 			.setSubject(username)
-			.claim(AUTHORIZATION_KEY, roleNames)  // List 형태로 권한 저장
+			.claim(AUTHORIZATION_KEY, role)  // List 형태로 권한 저장
 			.setExpiration(new Date(date.getTime() + ACCESS_TOKEN_TIME))
 			.setIssuedAt(date) // 발급일
 			.signWith(key, SignatureAlgorithm.HS256)
@@ -89,16 +84,12 @@ public class JwtProvider {
 	/**
 	 * Refresh 토큰 생성
 	 */
-	public String createRefreshToken(String username, Set<UserRole> roles) {
+	public String createRefreshToken(String username, UserRole userRole) {
 		Date date = new Date();
-
-		List<String> roleNames = roles.stream()
-			.map(UserRole::name)
-			.collect(Collectors.toList());
 
 		return BEARER_PREFIX + Jwts.builder()
 			.setSubject(username)
-			.claim(AUTHORIZATION_KEY, roleNames)  // List 형태로 권한 저장
+			.claim(AUTHORIZATION_KEY, userRole)  // List 형태로 권한 저장
 			.setExpiration(new Date(date.getTime() + REFRESH_TOKEN_TIME))
 			.setIssuedAt(date) // 발급일
 			.signWith(key, SignatureAlgorithm.HS256)
@@ -171,19 +162,17 @@ public class JwtProvider {
 	/**
 	 * 토큰에서 role 가져오기
 	 */
-	public Set<UserRole> getRoleFromToken(String token) {
+	public UserRole getRoleFromToken(String token) {
 		Claims claims = Jwts.parserBuilder()
 			.setSigningKey(key)
 			.build()
 			.parseClaimsJws(token)
 			.getBody();
 
-		List<String> roles = claims.get(AUTHORIZATION_KEY, List.class);
+		UserRole role = claims.get(AUTHORIZATION_KEY, UserRole.class);
 
-		if (roles != null) {
-			return roles.stream()
-				.map(UserRole::valueOf)
-				.collect(Collectors.toSet());
+		if (role != null) {
+			return role;
 		}
 
 		throw new IllegalArgumentException("토큰에서 역할을 찾을 수 없습니다.");

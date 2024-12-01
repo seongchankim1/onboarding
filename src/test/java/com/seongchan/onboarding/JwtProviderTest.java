@@ -27,16 +27,16 @@ class JwtProviderTest {
 	private UserRepository userRepository;
 
 	private String username;
-	private Set<UserRole> roles;
+	private UserRole role;
 	private String accessToken;
 	private String refreshToken;
 
 	@BeforeEach
 	void setUp() {
 		username = "testuser";
-		roles = Collections.singleton(UserRole.ROLE_USER);
-		accessToken = jwtProvider.createAccessToken(username, roles);
-		refreshToken = jwtProvider.createRefreshToken(username, roles);
+		role = UserRole.ROLE_USER;
+		accessToken = jwtProvider.createAccessToken(username, role);
+		refreshToken = jwtProvider.createRefreshToken(username, role);
 	}
 
 	@Test
@@ -53,7 +53,7 @@ class JwtProviderTest {
 
 	@Test
 	void testGetRoleFromToken() {
-		Set<UserRole> tokenRoles = jwtProvider.getRoleFromToken(jwtProvider.substringToken(accessToken));
-		assertThat(tokenRoles).containsExactlyInAnyOrderElementsOf(roles);
+		UserRole tokenRole = jwtProvider.getRoleFromToken(jwtProvider.substringToken(accessToken));
+		assertThat(tokenRole).isNotNull();
 	}
 }

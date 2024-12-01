@@ -1,5 +1,7 @@
 package com.seongchan.onboarding.dto;
 
+import java.time.LocalDate;
+
 import com.seongchan.onboarding.entity.Agent;
 import com.seongchan.onboarding.entity.Patch;
 
@@ -13,6 +15,6 @@ public class NoteRequestDto {
 	private String content;
 	private Agent agent;
 	private String comment;
-	private String date;
-	private Patch patch;
+	private LocalDate date;
+	private String patchVer;
 }

@@ -84,7 +84,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 	}
 
 	private void updateToken(String token, String username, HttpServletResponse res) throws IOException {
-		Set<UserRole> role = jwtProvider.getRoleFromToken(token);
+		UserRole role = jwtProvider.getRoleFromToken(token);
 		String newAccessToken = jwtProvider.createAccessToken(username, role);
 
 		res.setHeader(AUTHORIZATION_HEADER, newAccessToken);

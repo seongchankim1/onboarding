@@ -35,22 +35,18 @@ public class UserService {
 		String username = requestDto.getUsername();
 		String password = passwordEncoder.encode(requestDto.getPassword());
 		String nickname = requestDto.getNickname();
-		Set<UserRole> roles = Collections.singleton(UserRole.ROLE_USER);
+		UserRole userRole = UserRole.ROLE_USER;
 
 		User user = User.builder()
 			.username(username)
 			.password(password)
 			.nickname(nickname)
-			.authorities(roles)
+			.userRole(userRole)
 			.build();
 
 		userRepository.save(user);
 
-		List<AuthorityDto> authorityDtos = roles.stream()
-			.map(AuthorityDto::new)
-			.collect(Collectors.toList());
-
-		return new SignupResponseDto(username, nickname, authorityDtos);
+		return new SignupResponseDto(username, nickname, userRole);
 	}
 
 

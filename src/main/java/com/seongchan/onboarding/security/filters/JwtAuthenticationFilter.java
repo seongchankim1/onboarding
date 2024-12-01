@@ -64,7 +64,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         FilterChain chain, Authentication authResult) throws IOException {
         log.info("인증 성공 및 JWT 생성");
         String username = ((UserDetailsImpl) authResult.getPrincipal()).getUsername();
-        Set<UserRole> roles = ((UserDetailsImpl) authResult.getPrincipal()).getUser().getAuthorities();
+        UserRole roles = ((UserDetailsImpl) authResult.getPrincipal()).getUser().getUserRole();
 
         String accessToken = jwtProvider.createAccessToken(username, roles); // Set<UserRole> 전달
         String refreshToken = jwtProvider.createRefreshToken(username, roles);

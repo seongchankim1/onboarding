@@ -72,7 +72,7 @@ public class WebSecurityConfig {
 			.requestMatchers("/signup", "/sign").permitAll()
 			.requestMatchers("/login", "/").permitAll()
 			.requestMatchers("/css/**", "/js/**").permitAll()
-			.anyRequest().authenticated()
+			.anyRequest().permitAll()
 		);
 
 

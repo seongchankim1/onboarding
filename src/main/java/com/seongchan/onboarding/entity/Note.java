@@ -1,5 +1,6 @@
 package com.seongchan.onboarding.entity;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,6 +10,7 @@ import com.seongchan.onboarding.common.TimeStamp;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -35,23 +37,19 @@ public class Note {
 	@Column(nullable = false, columnDefinition = "TEXT")
 	private String content;
 
-	@OneToMany(mappedBy = "note", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<Agent> agents = new ArrayList<>();
-
 	@ManyToOne
-	@JoinColumn(nullable = false)
+	@JoinColumn(name = "patch_id", nullable = false)
 	private Patch patch;
 
 	@Column(nullable = false)
 	private String comment;
 
 	@Column(nullable = false)
-	private String date;
+	private LocalDate date;
 
 	@Builder
-	public Note(String content, Agent agent,Patch patch, String comment, String date) {
+	public Note(String content, Patch patch, String comment, LocalDate date) {
 		this.content = content;
-		this.agents.add(agent);
 		this.patch = patch;
 		this.comment = comment;
 		this.date = date;
