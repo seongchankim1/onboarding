@@ -1,42 +1,51 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Sidebar from "@/components/sidebar";
 import ContentContainer from "@/components/contentcontainer";
 
 export default function PatchNotesPage() {
     const [selectedSection, setSelectedSection] = useState("latestPatch");
     const [selectedPost, setSelectedPost] = useState(null);
-    const [isSubMenuOpen, setIsSubMenuOpen] = useState(false);
-    const [viewList, setViewList] = useState(false);
     const [patchData, setPatchData] = useState([]); // 패치 데이터를 저장할 상태
+    const [viewList, setViewList] = useState(false);
+    const [isLoading, setIsLoading] = useState(false); // 로딩 상태 추가
+    const [isSubMenuOpen, setIsSubMenuOpen] = useState(false); // 서브 메뉴 열림 상태 추가
 
-    useEffect(() => {
-        const fetchData = async () => {
-            const path = window.location.pathname;
+    const fetchData = async (section) => {
+        setIsLoading(true); // 로딩 시작
+        try {
+            let url = "";
 
-            try {
-                let url = "";
-                if (path.includes("latest-patch")) {
+            switch (section) {
+                case "latestPatch":
                     url = "http://localhost:8080/note?page=0&size=5&condition=newest";
-                } else if (path.includes("upcoming-patch")) {
-                    url = "http://localhost:8080/note?page=0&size=5&condition=newest"; // 예정 패치도 동일한 조건
-                } else if (path.includes("agent-updates")) {
+                    break;
+                case "upcomingPatch":
+                    url = "http://localhost:8080/note?page=0&size=5&condition=upcoming"; // 수정된 URL
+                    break;
+                case "agentUpdates":
                     url = "http://localhost:8080/note?page=0&size=5&condition=agent&agentName=NEON";
-                }
-
-                const response = await fetch(url);
-                const data = await response.json();
-
-                if (data?.data?.content) {
-                    setPatchData(data.data.content); // 데이터 저장
-                    setSelectedPost(data.data.content[0]); // 첫 번째 항목 선택
-                }
-            } catch (error) {
-                console.error("데이터 가져오기 실패:", error);
+                    break;
+                default:
+                    console.error("Unknown section:", section);
+                    return;
             }
-        };
 
-        fetchData();
-    }, []);
+            const response = await fetch(url);
+            const data = await response.json();
+
+            if (data?.data?.content) {
+                setPatchData(data.data.content); // 데이터 저장
+                setSelectedPost(null); // 선택된 항목 초기화
+                setViewList(true); // 목록 보기 활성화
+            } else {
+                console.error("데이터 형식이 잘못되었습니다.", data);
+            }
+        } catch (error) {
+            console.error("데이터 가져오기 실패:", error);
+        } finally {
+            setIsLoading(false); // 로딩 종료
+        }
+    };
 
     const handleShowList = () => {
         setViewList(true);
@@ -52,16 +61,20 @@ export default function PatchNotesPage() {
         <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-red-900 text-white flex">
             <Sidebar
                 selectedSection={selectedSection}
-                setSelectedSection={setSelectedSection}
-                isSubMenuOpen={isSubMenuOpen}
-                setIsSubMenuOpen={setIsSubMenuOpen}
+                setSelectedSection={(section) => {
+                    setSelectedSection(section);
+                    fetchData(section); // 섹션 선택 시 데이터 가져오기
+                }}
                 setViewList={setViewList}
+                isSubMenuOpen={isSubMenuOpen} // 추가된 상태 전달
+                setIsSubMenuOpen={setIsSubMenuOpen} // 상태 변경 함수 전달
             />
             <ContentContainer
                 viewList={viewList}
                 selectedSection={selectedSection}
                 selectedPost={selectedPost}
-                patchData={patchData} // 백엔드 데이터 전달
+                patchData={patchData} // 데이터 전달
+                isLoading={isLoading} // 로딩 상태 전달
                 handleShowList={handleShowList}
                 handleSelectPatch={handleSelectPatch}
             />

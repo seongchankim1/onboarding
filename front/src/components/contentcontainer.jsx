@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-export default function ContentContainer({ viewList, selectedSection, selectedPost, patchData, handleShowList, handleSelectPatch }) {
+export default function ContentContainer({ viewList, selectedSection, selectedPost, patchData, isLoading, handleShowList, handleSelectPatch }) {
     const [isTransitioning, setIsTransitioning] = useState(false);
 
     const handleTransition = (callback) => {
@@ -18,7 +18,9 @@ export default function ContentContainer({ viewList, selectedSection, selectedPo
                     isTransitioning ? "opacity-0 scale-95" : "opacity-100 scale-100"
                 }`}
             >
-                {viewList ? (
+                {isLoading ? (
+                    <p className="text-gray-400 text-center">로딩 중...</p>
+                ) : viewList ? (
                     // 패치 목록 보기
                     <div>
                         <h1 className="text-4xl font-bold text-red-400 mb-4">
