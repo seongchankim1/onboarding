@@ -1,51 +1,55 @@
 import React, { useState, useEffect } from "react";
 import Sidebar from "@/components/sidebar";
 import ContentContainer from "@/components/contentcontainer";
-import { patchSections } from "@/data/patchSections";
 
 export default function PatchNotesPage() {
-    const [selectedSection, setSelectedSection] = useState("latestPatch"); // 선택된 섹션
-    const [selectedPost, setSelectedPost] = useState(null); // 현재 표시할 콘텐츠 상태
-    const [isSubMenuOpen, setIsSubMenuOpen] = useState(false); // 서브 메뉴 열림 상태
-    const [viewList, setViewList] = useState(false); // 목록 보기 상태
+    const [selectedSection, setSelectedSection] = useState("latestPatch");
+    const [selectedPost, setSelectedPost] = useState(null);
+    const [isSubMenuOpen, setIsSubMenuOpen] = useState(false);
+    const [viewList, setViewList] = useState(false);
+    const [patchData, setPatchData] = useState([]); // 패치 데이터를 저장할 상태
 
     useEffect(() => {
-        // URL을 확인해 기본값 설정
-        const path = window.location.pathname;
+        const fetchData = async () => {
+            const path = window.location.pathname;
 
-        if (path.includes("latest-patch")) {
-            setSelectedSection("latestPatch");
-            setSelectedPost(patchSections.latestPatch[0]); // 최신 패치의 첫 번째 포스트
-            setIsSubMenuOpen(true);
-        } else if (path.includes("upcoming-patch")) {
-            setSelectedSection("upcomingPatch");
-            setSelectedPost(patchSections.upcomingPatch[0]); // 예정 패치의 첫 번째 포스트
-            setIsSubMenuOpen(true);
-        } else if (path.includes("agent-updates")) {
-            setSelectedSection("agentUpdates");
-            setSelectedPost(patchSections.agentUpdates[0]); // 요원 업데이트의 첫 번째 포스트
-            setIsSubMenuOpen(true);
-        } else {
-            // 기본값으로 최신 패치의 첫 번째 포스트를 설정
-            setSelectedSection("latestPatch");
-            setSelectedPost(patchSections.latestPatch[0]);
-            setIsSubMenuOpen(true);
-        }
+            try {
+                let url = "";
+                if (path.includes("latest-patch")) {
+                    url = "http://localhost:8080/note?page=0&size=5&condition=newest";
+                } else if (path.includes("upcoming-patch")) {
+                    url = "http://localhost:8080/note?page=0&size=5&condition=newest"; // 예정 패치도 동일한 조건
+                } else if (path.includes("agent-updates")) {
+                    url = "http://localhost:8080/note?page=0&size=5&condition=agent&agentName=NEON";
+                }
+
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (data?.data?.content) {
+                    setPatchData(data.data.content); // 데이터 저장
+                    setSelectedPost(data.data.content[0]); // 첫 번째 항목 선택
+                }
+            } catch (error) {
+                console.error("데이터 가져오기 실패:", error);
+            }
+        };
+
+        fetchData();
     }, []);
 
     const handleShowList = () => {
-        setViewList(true); // 목록 보기 활성화
-        setSelectedPost(null); // 현재 선택된 콘텐츠 초기화
+        setViewList(true);
+        setSelectedPost(null);
     };
 
     const handleSelectPatch = (patch) => {
-        setViewList(false); // 목록 보기 종료
-        setSelectedPost(patch); // 선택된 패치 설정
+        setViewList(false);
+        setSelectedPost(patch);
     };
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-red-900 text-white flex">
-            {/* Sidebar에 상태와 함수 전달 */}
             <Sidebar
                 selectedSection={selectedSection}
                 setSelectedSection={setSelectedSection}
@@ -53,12 +57,11 @@ export default function PatchNotesPage() {
                 setIsSubMenuOpen={setIsSubMenuOpen}
                 setViewList={setViewList}
             />
-            {/* ContentContainer에 데이터와 상태 전달 */}
             <ContentContainer
                 viewList={viewList}
                 selectedSection={selectedSection}
                 selectedPost={selectedPost}
-                patchSections={patchSections}
+                patchData={patchData} // 백엔드 데이터 전달
                 handleShowList={handleShowList}
                 handleSelectPatch={handleSelectPatch}
             />

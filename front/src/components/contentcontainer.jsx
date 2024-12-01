@@ -1,6 +1,6 @@
-import React, { useState } from "react"; // useState를 React에서 가져오기
+import React, { useState } from "react";
 
-export default function ContentContainer({ viewList, selectedSection, selectedPost, patchSections, handleShowList, handleSelectPatch }) {
+export default function ContentContainer({ viewList, selectedSection, selectedPost, patchData, handleShowList, handleSelectPatch }) {
     const [isTransitioning, setIsTransitioning] = useState(false);
 
     const handleTransition = (callback) => {
@@ -8,7 +8,7 @@ export default function ContentContainer({ viewList, selectedSection, selectedPo
         setTimeout(() => {
             callback();
             setIsTransitioning(false);
-        }, 300); // 애니메이션 지속 시간
+        }, 300);
     };
 
     return (
@@ -29,13 +29,13 @@ export default function ContentContainer({ viewList, selectedSection, selectedPo
                                     : "요원별 업데이트"}
                         </h1>
                         <div className="space-y-4">
-                            {patchSections[selectedSection].map((patch) => (
+                            {patchData.map((patch) => (
                                 <div
                                     key={patch.id}
                                     className="p-4 bg-gray-800 rounded-lg shadow-lg hover:bg-gray-700 transition cursor-pointer"
                                     onClick={() => handleTransition(() => handleSelectPatch(patch))}
                                 >
-                                    <h2 className="text-xl font-semibold">{patch.title}</h2>
+                                    <h2 className="text-xl font-semibold">{patch.comment}</h2>
                                     <p className="text-gray-400 text-sm">{patch.date}</p>
                                 </div>
                             ))}
@@ -44,7 +44,7 @@ export default function ContentContainer({ viewList, selectedSection, selectedPo
                 ) : selectedPost ? (
                     // 선택된 패치 보기
                     <div>
-                        <h1 className="text-4xl font-bold text-red-400 mb-4">{selectedPost.title}</h1>
+                        <h1 className="text-4xl font-bold text-red-400 mb-4">{selectedPost.comment}</h1>
                         <p className="text-gray-400 mb-4">{selectedPost.date}</p>
                         <p className="text-gray-200 whitespace-pre-wrap">{selectedPost.content}</p>
                         <button

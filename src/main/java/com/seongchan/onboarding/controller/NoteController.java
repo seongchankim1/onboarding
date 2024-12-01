@@ -46,9 +46,12 @@ public class NoteController {
 		@RequestParam("page") int page,
 		@RequestParam("size") int size,
 		@RequestParam String condition,
-		@RequestParam String agentName
+		@RequestParam(required = false) String agentName
 	) {
-		Agent agent = Agent.valueOf(agentName.toUpperCase());
+		Agent agent = null;
+		if (agentName != null) {
+		 agent = Agent.valueOf(agentName.toUpperCase());
+		}
 		Page<NoteResponseDto> responseDto = noteService.getNotesWithCondition(page, size, condition, agent);
 		PageableResponse<NoteResponseDto> responseEntity = new PageableResponse<>(responseDto);
 		return ResponseUtils.of(NOTE_GET_SUCCESS, responseEntity);
