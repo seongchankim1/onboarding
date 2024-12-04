@@ -1,12 +1,15 @@
 package com.seongchan.onboarding.service;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.seongchan.onboarding.dto.AgentResponseDto;
 import com.seongchan.onboarding.dto.NoteResponseDto;
 import com.seongchan.onboarding.dto.NoteRequestDto;
 import com.seongchan.onboarding.entity.Agent;
@@ -71,5 +74,12 @@ public class NoteService {
 
 		// 엔티티를 DTO로 변환하여 반환
 		return notesPage.map(NoteResponseDto::new);
+	}
+
+	// 모든 요원을 반환하는 메서드
+	public List<AgentResponseDto> getAgentList() {
+		return List.of(Agent.values()).stream()
+			.map(agent -> new AgentResponseDto(agent.name(), agent.getKoreanName()))
+			.collect(Collectors.toList());
 	}
 }

@@ -8,6 +8,8 @@ export default function ContentContainer({
                                              isLoading,
                                              handleShowList,
                                              handleSelectPatch,
+                                             agentList,
+                                             handleSelectAgent, // 추가된 부분
                                          }) {
     const [isTransitioning, setIsTransitioning] = useState(false);
 
@@ -39,7 +41,6 @@ export default function ContentContainer({
                     // 로딩 표시
                     <p className="text-gray-400 text-center">로딩 중...</p>
                 ) : viewList ? (
-                    // 패치 목록 보기
                     <div>
                         <h1 className="text-4xl font-bold text-red-400 mb-4">
                             {selectedSection === "latestPatch"
@@ -48,45 +49,101 @@ export default function ContentContainer({
                                     ? "패치 예정"
                                     : "요원별 업데이트"}
                         </h1>
-                        <div className="space-y-6">
-                            {Object.entries(groupedPatches).map(([version, notes]) => (
+
+                        {selectedSection === "agentUpdates" ? (
+                            agentList && agentList.length > 0 ? (
+                                // 요원 목록 보기 - 그리드 형태로 작게 렌더링
                                 <div
-                                    key={version}
-                                    className="p-4 bg-gray-800 rounded-lg shadow-lg hover:bg-gray-700 transition cursor-pointer"
-                                    onClick={() => handleTransition(() => handleSelectPatch({ version, notes }))}
+                                    className="grid gap-2"
+                                    style={{
+                                        gridTemplateColumns:
+                                            "repeat(auto-fit, minmax(100px, 1fr))",
+                                    }}
                                 >
-                                    <div className="flex justify-between items-center">
-                                        <h2 className="text-xl font-semibold">{version}</h2>
-                                        <p className="text-gray-400 text-sm">
-                                            날짜: {notes[0]?.date}
-                                        </p>
-                                    </div>
-                                    <p className="text-gray-400 text-sm italic">
-                                        총 {notes.length}개의 노트
-                                    </p>
+                                    {agentList.map((agent, index) => (
+                                        <div
+                                            key={`${agent.name}-${index}`} // 고유한 값 설정
+                                            className="flex flex-col items-center p-2 bg-gray-800 rounded-md cursor-pointer hover:bg-red-600 transition-transform transform active:scale-95"
+                                            onClick={() =>
+                                                handleSelectAgent(agent.name) // 요원 선택 시 해당 요원의 패치 데이터 가져오기
+                                            }
+                                            style={{ height: "auto" }}
+                                        >
+                                            <div className="w-16 h-16 flex items-center justify-center mb-1">
+                                                {/* 아이콘 이미지 추가 */}
+                                                <img
+                                                    src={`/icons/character/${agent.name.toLowerCase()}.png`}
+                                                    alt={`${agent.koreanName} icon`}
+                                                    className="w-full h-full object-contain rounded-full"
+                                                />
+                                            </div>
+                                            {/* 한글 이름 출력 */}
+                                            <span className="text-md text-center truncate">
+                                                {agent.koreanName}
+                                            </span>
+                                        </div>
+                                    ))}
                                 </div>
-                            ))}
-                        </div>
+                            ) : (
+                                <p className="text-gray-400">
+                                    요원 목록을 찾을 수 없습니다.
+                                </p>
+                            )
+                        ) : (
+                            // latestPatch 또는 upcomingPatch의 경우 패치 노트 목록 보기
+                            <div className="space-y-6">
+                                {Object.entries(groupedPatches).map(
+                                    ([version, notes]) => (
+                                        <div
+                                            key={version} // 버전을 고유한 키로 사용
+                                            className="p-4 bg-gray-800 rounded-lg shadow-lg hover:bg-gray-700 transition cursor-pointer"
+                                            onClick={() =>
+                                                handleTransition(() =>
+                                                    handleSelectPatch({
+                                                        version,
+                                                        notes,
+                                                    })
+                                                )
+                                            }
+                                        >
+                                            <div className="flex justify-between items-center">
+                                                <h2 className="text-xl font-semibold">
+                                                    {version}
+                                                </h2>
+                                                <p className="text-gray-400 text-sm">
+                                                    날짜: {notes[0]?.date}
+                                                </p>
+                                            </div>
+                                            <p className="text-gray-400 text-sm italic">
+                                                총 {notes.length}개의 노트
+                                            </p>
+                                        </div>
+                                    )
+                                )}
+                            </div>
+                        )}
                     </div>
-                ) : selectedPost ? (
+                ) : selectedPost && selectedPost.notes && selectedPost.notes.length > 0 ? (
                     // 선택된 패치 보기
                     <div>
-                        <h1 className="text-4xl font-bold text-red-400 mb-4">{selectedPost.version}</h1>
-                        <h2 className="text-gray-300 text-md italic" >
+                        <h1 className="text-4xl font-bold text-red-400 mb-4">
+                            {selectedPost.version || selectedPost.agentName}
+                        </h1>
+                        <h2 className="text-gray-300 text-md italic">
                             {selectedPost.notes[0]?.date || "날짜 정보 없음"}
                         </h2>
                         <p className="text-gray-400 text-md mb-6 italic">
                             총 {selectedPost.notes.length}개의 노트
                         </p>
                         <div className="space-y-6">
-                            {selectedPost.notes.map((note) => (
+                            {selectedPost.notes.map((note, index) => (
                                 <div
-                                    key={note.id}
+                                    key={`${note.id}-${index}`} // 노트 ID에 인덱스를 조합해 고유한 키로 사용
                                     className="p-4 bg-gray-800 rounded-lg shadow-md flex items-start gap-4"
                                 >
                                     {/* 에이전트 이미지 추가 */}
                                     <img
-                                        src={`../../public/icons/character/${note.agent}.png`}
+                                        src={`/icons/character/${note.agent.toLowerCase()}.png`}
                                         alt={`${note.agent} icon`}
                                         className="w-16 h-16 object-cover rounded-full"
                                     />

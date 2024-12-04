@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.seongchan.onboarding.common.PageableResponse;
 import com.seongchan.onboarding.common.ResponseUtils;
+import com.seongchan.onboarding.dto.AgentResponseDto;
 import com.seongchan.onboarding.dto.HttpResponseDto;
 import com.seongchan.onboarding.dto.NoteRequestDto;
 import com.seongchan.onboarding.dto.NoteResponseDto;
@@ -20,6 +21,8 @@ import com.seongchan.onboarding.service.NoteService;
 import lombok.RequiredArgsConstructor;
 
 import static com.seongchan.onboarding.common.ResponseCodeEnum.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -51,5 +54,12 @@ public class NoteController {
 		PageableResponse<NoteResponseDto> responseEntity = new PageableResponse<>(responseDto);
 		return ResponseUtils.of(NOTE_GET_SUCCESS, responseEntity);
 
+	}
+
+	// 요원 목록 가져오기
+	@GetMapping("/list")
+	public ResponseEntity<HttpResponseDto> getAgentList() {
+		List<AgentResponseDto> agentList = noteService.getAgentList();
+		return ResponseUtils.of(AGENT_LIST_GET_SUCCESS, agentList);
 	}
 }

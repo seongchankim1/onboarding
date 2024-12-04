@@ -5,7 +5,7 @@ export default function Sidebar({
                                     setSelectedSection,
                                     setViewList,
                                     isSubMenuOpen,
-                                    setIsSubMenuOpen, // 부모로부터 전달받은 함수
+                                    setIsSubMenuOpen,
                                 }) {
     return (
         <aside className="w-1/6 bg-gradient-to-t from-red-900 to-gray-800 p-4 shadow-lg rounded-2xl my-6 mx-4">
@@ -20,7 +20,7 @@ export default function Sidebar({
                     className={`p-3 rounded-xl cursor-pointer transition-all duration-300 transform ${
                         isSubMenuOpen ? "bg-red-700 scale-105 shadow-md" : "bg-gray-700 hover:bg-red-600"
                     }`}
-                    onClick={() => setIsSubMenuOpen(!isSubMenuOpen)} // 클릭 이벤트 수정
+                    onClick={() => setIsSubMenuOpen(!isSubMenuOpen)}
                 >
                     <div className="flex justify-between items-center">
                         <span>패치 관련</span>
@@ -29,8 +29,8 @@ export default function Sidebar({
                                 isSubMenuOpen ? "rotate-180" : ""
                             }`}
                         >
-              ▼
-            </span>
+                            ▼
+                        </span>
                     </div>
                 </li>
                 {isSubMenuOpen && (
