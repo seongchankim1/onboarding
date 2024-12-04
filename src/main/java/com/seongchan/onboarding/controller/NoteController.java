@@ -1,7 +1,5 @@
 package com.seongchan.onboarding.controller;
 
-import java.util.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,14 +10,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.seongchan.onboarding.common.PageableResponse;
-import com.seongchan.onboarding.common.ResponseCodeEnum;
 import com.seongchan.onboarding.common.ResponseUtils;
 import com.seongchan.onboarding.dto.HttpResponseDto;
 import com.seongchan.onboarding.dto.NoteRequestDto;
-import com.seongchan.onboarding.dto.SignupRequestDto;
-import com.seongchan.onboarding.dto.SignupResponseDto;
+import com.seongchan.onboarding.dto.NoteResponseDto;
 import com.seongchan.onboarding.entity.Agent;
-import com.seongchan.onboarding.entity.Note;
 import com.seongchan.onboarding.service.NoteService;
 
 import lombok.RequiredArgsConstructor;

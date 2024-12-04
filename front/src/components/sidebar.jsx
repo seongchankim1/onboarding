@@ -8,7 +8,7 @@ export default function Sidebar({
                                     setIsSubMenuOpen, // 부모로부터 전달받은 함수
                                 }) {
     return (
-        <aside className="w-1/5 bg-gradient-to-t from-red-900 to-gray-800 p-4 shadow-lg rounded-2xl my-6 mx-4">
+        <aside className="w-1/6 bg-gradient-to-t from-red-900 to-gray-800 p-4 shadow-lg rounded-2xl my-6 mx-4">
             <div className="flex flex-col items-center mb-4">
                 <div className="w-12 h-12 bg-red-700 rounded-full flex items-center justify-center shadow-md">
                     <span className="text-xl font-bold">V</span>

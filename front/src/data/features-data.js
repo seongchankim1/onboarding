@@ -1,6 +1,6 @@
-import tailwindBlackIcon from "C:/Users/minie/IdeaProjects/onboarding/front/src/assets/icons/black/tailwind-black.png";
-import spycamBlackIcon from "C:/Users/minie/IdeaProjects/onboarding/front/src/assets/icons/black/spycam-black.png";
-import resurrectionBlackIcon from "C:/Users/minie/IdeaProjects/onboarding/front/src/assets/icons/black/resurrection-black.png";
+import tailwindBlackIcon from "../../public/icons/black/tailwind-black.png";
+import spycamBlackIcon from "../../public/icons/black/spycam-black.png";
+import resurrectionBlackIcon from "../../public/icons/black/resurrection-black.png";
 
 export const featuresData = [
   {

@@ -20,7 +20,7 @@ export default function PatchNotesPage() {
                     url = "http://localhost:8080/note?page=0&size=5&condition=newest";
                     break;
                 case "upcomingPatch":
-                    url = "http://localhost:8080/note?page=0&size=5&condition=upcoming"; // 수정된 URL
+                    url = "http://localhost:8080/note?page=0&size=5&condition=upcomingPatch"; // 수정된 URL
                     break;
                 case "agentUpdates":
                     url = "http://localhost:8080/note?page=0&size=5&condition=agent&agentName=NEON";

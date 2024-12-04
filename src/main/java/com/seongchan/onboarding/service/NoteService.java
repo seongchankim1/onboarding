@@ -7,7 +7,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.seongchan.onboarding.controller.NoteResponseDto;
+import com.seongchan.onboarding.dto.NoteResponseDto;
 import com.seongchan.onboarding.dto.NoteRequestDto;
 import com.seongchan.onboarding.entity.Agent;
 import com.seongchan.onboarding.entity.Note;
@@ -56,7 +56,7 @@ public class NoteService {
 				notesPage = noteRepository.findAllByOrderByDateDesc(pageable);
 				break;
 
-			case "expected": // 예정된 패치
+			case "upcomingPatch": // 예정된 패치
 				notesPage = noteRepository.findExpectedNotes(pageable);
 				break;
 
