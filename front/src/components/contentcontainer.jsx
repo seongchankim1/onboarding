@@ -39,7 +39,6 @@ export default function ContentContainer({
                 }`}
             >
                 {isLoading ? (
-                    // 로딩 표시
                     <p className="text-gray-400 text-center">로딩 중...</p>
                 ) : viewList ? (
                     <div>
@@ -54,7 +53,6 @@ export default function ContentContainer({
                         </h1>
 
                         {selectedSection === "agentUpdates" && !selectedAgent ? (
-                            // 요원 목록 보기 - 그리드 형태로 작게 렌더링
                             agentList && agentList.length > 0 ? (
                                 <div
                                     className="grid gap-2"
@@ -64,13 +62,12 @@ export default function ContentContainer({
                                 >
                                     {agentList.map((agent, index) => (
                                         <div
-                                            key={`${agent.name}-${index}`} // 고유한 값 설정
+                                            key={`${agent.name}-${index}`}
                                             className="flex flex-col items-center p-2 bg-gray-800 rounded-md cursor-pointer hover:bg-red-600 transition-transform transform active:scale-95"
-                                            onClick={() => handleSelectAgent(agent.name)} // 요원 선택 시 해당 요원의 패치 데이터 가져오기
+                                            onClick={() => handleSelectAgent(agent.name)}
                                             style={{ height: "auto" }}
                                         >
                                             <div className="w-16 h-16 flex items-center justify-center mb-1">
-                                                {/* 아이콘 이미지 추가 */}
                                                 <img
                                                     src={`/icons/character/${agent.name.toLowerCase()}.png`}
                                                     alt={`${agent.koreanName} icon`}
@@ -87,9 +84,7 @@ export default function ContentContainer({
                                 <p className="text-gray-400">요원 목록을 찾을 수 없습니다.</p>
                             )
                         ) : (
-                            // 최신 패치 또는 요원별 업데이트 목록 보기
                             <div className="space-y-6">
-                                {/* 요원 선택 후 돌아가기 버튼 추가 */}
                                 {selectedAgent && (
                                     <button
                                         className="mb-4 px-4 py-2 bg-red-700 hover:bg-red-600 rounded-lg shadow-lg"
@@ -105,10 +100,9 @@ export default function ContentContainer({
                                 )}
 
                                 {selectedAgent
-                                    ? // 요원별 업데이트의 경우 모든 패치 표시
-                                    patchData.map((note, index) => (
+                                    ? patchData.map((note, index) => (
                                         <div
-                                            key={`${note.id}-${index}`} // 노트 ID에 인덱스를 조합해 고유한 키로 사용
+                                            key={`${note.id}-${index}`}
                                             className="p-4 bg-gray-800 rounded-lg shadow-md flex items-start gap-4"
                                         >
                                             <img
@@ -129,10 +123,9 @@ export default function ContentContainer({
                                             </div>
                                         </div>
                                     ))
-                                    : // 최신 패치와 업데이트 예정의 경우 목록 형태로 표시
-                                    Object.entries(groupedPatches).map(([version, notes]) => (
+                                    : Object.entries(groupedPatches).map(([version, notes]) => (
                                         <div
-                                            key={version} // 버전을 고유한 키로 사용
+                                            key={version}
                                             className="p-4 bg-gray-800 rounded-lg shadow-lg hover:bg-gray-700 transition cursor-pointer"
                                             onClick={() =>
                                                 handleTransition(() =>
@@ -155,7 +148,6 @@ export default function ContentContainer({
                         )}
                     </div>
                 ) : selectedPost && selectedPost.notes && selectedPost.notes.length > 0 ? (
-                    // 선택된 패치 보기
                     <div>
                         <h1 className="text-4xl font-bold text-red-400 mb-4">
                             {selectedPost.version || selectedPost.agentName}
@@ -169,7 +161,7 @@ export default function ContentContainer({
                         <div className="space-y-6">
                             {selectedPost.notes.map((note, index) => (
                                 <div
-                                    key={`${note.id}-${index}`} // 노트 ID에 인덱스를 조합해 고유한 키로 사용
+                                    key={`${note.id}-${index}`}
                                     className="p-4 bg-gray-800 rounded-lg shadow-md flex items-start gap-4"
                                 >
                                     <img
@@ -193,9 +185,8 @@ export default function ContentContainer({
                             onClick={() =>
                                 handleTransition(() => {
                                     handleShowList();
-                                    // 요원 목록으로 돌아가도록 selectedAgent 초기화
                                     if (selectedSection === "agentUpdates") {
-                                        handleSelectAgent(null); // 요원 선택 해제
+                                        handleSelectAgent(null);
                                     }
                                 })
                             }
@@ -204,7 +195,6 @@ export default function ContentContainer({
                         </button>
                     </div>
                 ) : (
-                    // 항목이 없을 경우
                     <p className="text-gray-300">항목을 선택하세요.</p>
                 )}
             </div>

@@ -49,7 +49,7 @@ export default function PatchNotesPage() {
                         setIsLoading(false);
                         return;
                     }
-                    url = `http://localhost:8080/note?page=0&size=100&condition=agent&agentName=${agentName}`;
+                    url = `http://localhost:8080/note?page=0&size=5&condition=agent&agentName=${agentName}`;
                     break;
                 default:
                     console.error("Unknown section:", section);
@@ -63,7 +63,7 @@ export default function PatchNotesPage() {
             if (data?.data?.content) {
                 setPatchData(data.data.content); // 데이터 저장
                 setSelectedPost(null); // 선택된 항목 초기화
-                setViewList(true); // 목록 보기 활성화
+                setViewList(true); // 목록 보기 활성화 (이 부분이 업데이트 목록으로 전환하는 핵심)
             } else {
                 console.error("데이터 형식이 잘못되었습니다.", data);
             }
@@ -96,18 +96,18 @@ export default function PatchNotesPage() {
             <Sidebar
                 selectedSection={selectedSection}
                 setSelectedSection={(section) => {
+                    // 다른 섹션 선택 시 selectedAgent 초기화
+                    setSelectedAgent(null); // 요원 선택 상태 초기화
                     setSelectedSection(section);
-                    setViewList(false); // 메뉴 선택 시 요원 목록 or 패치 목록으로 전환 준비
                     if (section !== "agentUpdates") {
-                        fetchData(section);
+                        fetchData(section); // 섹션 선택 시 데이터 가져오기
                     } else {
                         setViewList(false); // 요원 목록 보기로 전환
-                        setSelectedAgent(null); // 요원 선택 해제
                     }
                 }}
                 setViewList={setViewList}
-                isSubMenuOpen={isSubMenuOpen} // 서브 메뉴 상태 전달
-                setIsSubMenuOpen={setIsSubMenuOpen} // 서브 메뉴 상태 변경 함수 전달
+                isSubMenuOpen={isSubMenuOpen} // 추가된 상태 전달
+                setIsSubMenuOpen={setIsSubMenuOpen} // 상태 변경 함수 전달
             />
             <ContentContainer
                 viewList={viewList}
