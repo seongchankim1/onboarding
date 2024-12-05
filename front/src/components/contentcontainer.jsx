@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import AgentList from "@/components/agentList.jsx";
 import PatchList from "@/components/patchList.jsx";
 import PatchDetail from "@/components/patchDetail.jsx";
@@ -16,24 +16,13 @@ export default function ContentContainer({
                                              selectedAgent,
                                          }) {
     const [isTransitioning, setIsTransitioning] = useState(false);
-    const [transitionCallback, setTransitionCallback] = useState(null);
-
-    // useEffect를 이용하여 애니메이션이 끝났을 때 상태 변경
-    useEffect(() => {
-        if (isTransitioning && transitionCallback) {
-            // 애니메이션이 끝날 시점에 콜백 실행 후 상태 변경
-            const timer = setTimeout(() => {
-                transitionCallback();
-                setIsTransitioning(false);
-                setTransitionCallback(null);
-            }, 300);
-            return () => clearTimeout(timer);
-        }
-    }, [isTransitioning, transitionCallback]);
 
     const handleTransition = (callback) => {
         setIsTransitioning(true);
-        setTransitionCallback(() => callback);
+        setTimeout(() => {
+            callback();
+            setIsTransitioning(false);
+        }, 300);
     };
 
     return (
@@ -76,6 +65,7 @@ export default function ContentContainer({
                                 }, {})}
                                 handleSelectPatch={handleSelectPatch}
                                 handleTransition={handleTransition}
+                                handleShowList={handleShowList}
                             />
                         )}
                     </div>
