@@ -12,7 +12,6 @@ export default function PatchNotesPage() {
     const [agentList, setAgentList] = useState([]); // 요원 목록 상태 추가
     const [selectedAgent, setSelectedAgent] = useState(null); // 선택된 요원 이름
 
-    // 요원 목록 가져오기
     useEffect(() => {
         const fetchAgentList = async () => {
             try {
@@ -27,21 +26,19 @@ export default function PatchNotesPage() {
                 console.error("요원 목록 가져오기 실패:", error);
             }
         };
-
         fetchAgentList();
     }, []);
 
-    const fetchData = async (section, agentName = null) => {
-        setIsLoading(true); // 로딩 시작
+    const fetchData = async (section, agentName = null, page = 0) => {
+        setIsLoading(true);
         try {
             let url = "";
-
             switch (section) {
                 case "latestPatch":
-                    url = "http://localhost:8080/note?page=0&size=5&condition=newest";
+                    url = `http://localhost:8080/note?page=${page}&size=5&condition=newest`;
                     break;
                 case "upcomingPatch":
-                    url = "http://localhost:8080/note?page=0&size=5&condition=upcomingPatch";
+                    url = `http://localhost:8080/note?page=${page}&size=5&condition=upcomingPatch`;
                     break;
                 case "agentUpdates":
                     if (!agentName) {
@@ -49,7 +46,7 @@ export default function PatchNotesPage() {
                         setIsLoading(false);
                         return;
                     }
-                    url = `http://localhost:8080/note?page=0&size=5&condition=agent&agentName=${agentName}`;
+                    url = `http://localhost:8080/note?page=${page}&size=5&condition=agent&agentName=${agentName}`;
                     break;
                 default:
                     console.error("Unknown section:", section);
@@ -61,20 +58,24 @@ export default function PatchNotesPage() {
             const data = await response.json();
 
             if (data?.data?.content) {
-                setPatchData(data.data.content); // 데이터 저장
-                setSelectedPost(null); // 선택된 항목 초기화
-                setViewList(true); // 목록 보기 활성화 (이 부분이 업데이트 목록으로 전환하는 핵심)
+                setPatchData(data.data.content);
+                setSelectedPost(null);
+                setViewList(true);
             } else {
                 console.error("데이터 형식이 잘못되었습니다.", data);
             }
         } catch (error) {
             console.error("데이터 가져오기 실패:", error);
         } finally {
-            setIsLoading(false); // 로딩 종료
+            setIsLoading(false);
         }
     };
 
     const handleShowList = () => {
+        if (selectedSection === "agentUpdates" && selectedAgent) {
+            // 요원별 업데이트에서 돌아갈 때는 요원 목록을 보여주기 위해 selectedAgent를 null로 설정
+            setSelectedAgent(null);
+        }
         setViewList(true);
         setSelectedPost(null);
     };
@@ -88,7 +89,10 @@ export default function PatchNotesPage() {
         setSelectedSection("agentUpdates");
         setSelectedAgent(agentName); // 선택된 요원 저장
         setViewList(false); // 요원 목록 보기 해제 후 업데이트 보기로 전환
-        fetchData("agentUpdates", agentName);
+
+        if (agentName) {
+            fetchData("agentUpdates", agentName);
+        }
     };
 
     return (
@@ -96,30 +100,30 @@ export default function PatchNotesPage() {
             <Sidebar
                 selectedSection={selectedSection}
                 setSelectedSection={(section) => {
-                    // 다른 섹션 선택 시 selectedAgent 초기화
-                    setSelectedAgent(null); // 요원 선택 상태 초기화
+                    setSelectedAgent(null);
                     setSelectedSection(section);
                     if (section !== "agentUpdates") {
-                        fetchData(section); // 섹션 선택 시 데이터 가져오기
+                        fetchData(section);
                     } else {
-                        setViewList(false); // 요원 목록 보기로 전환
+                        setViewList(false);
                     }
                 }}
                 setViewList={setViewList}
-                isSubMenuOpen={isSubMenuOpen} // 추가된 상태 전달
-                setIsSubMenuOpen={setIsSubMenuOpen} // 상태 변경 함수 전달
+                isSubMenuOpen={isSubMenuOpen}
+                setIsSubMenuOpen={setIsSubMenuOpen}
             />
             <ContentContainer
                 viewList={viewList}
                 selectedSection={selectedSection}
                 selectedPost={selectedPost}
-                patchData={patchData} // 데이터 전달
-                isLoading={isLoading} // 로딩 상태 전달
+                patchData={patchData}
+                isLoading={isLoading}
                 handleShowList={handleShowList}
                 handleSelectPatch={handleSelectPatch}
-                agentList={agentList} // 요원 목록 전달
-                handleSelectAgent={handleSelectAgent} // 요원 선택 핸들러 전달
-                selectedAgent={selectedAgent} // 선택된 요원 전달
+                agentList={agentList}
+                handleSelectAgent={handleSelectAgent}
+                selectedAgent={selectedAgent}
+                fetchData={fetchData}
             />
         </div>
     );

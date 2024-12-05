@@ -1,4 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import AgentList from "@/components/agentList.jsx";
+import PatchList from "@/components/patchList.jsx";
+import PatchDetail from "@/components/patchDetail.jsx";
 
 export default function ContentContainer({
                                              viewList,
@@ -13,23 +16,25 @@ export default function ContentContainer({
                                              selectedAgent,
                                          }) {
     const [isTransitioning, setIsTransitioning] = useState(false);
+    const [transitionCallback, setTransitionCallback] = useState(null);
+
+    // useEffect를 이용하여 애니메이션이 끝났을 때 상태 변경
+    useEffect(() => {
+        if (isTransitioning && transitionCallback) {
+            // 애니메이션이 끝날 시점에 콜백 실행 후 상태 변경
+            const timer = setTimeout(() => {
+                transitionCallback();
+                setIsTransitioning(false);
+                setTransitionCallback(null);
+            }, 300);
+            return () => clearTimeout(timer);
+        }
+    }, [isTransitioning, transitionCallback]);
 
     const handleTransition = (callback) => {
         setIsTransitioning(true);
-        setTimeout(() => {
-            callback();
-            setIsTransitioning(false);
-        }, 300); // 애니메이션 지속 시간
+        setTransitionCallback(() => callback);
     };
-
-    // 동일한 버전을 하나로 묶음
-    const groupedPatches = patchData.reduce((groups, patch) => {
-        if (!groups[patch.version]) {
-            groups[patch.version] = [];
-        }
-        groups[patch.version].push(patch);
-        return groups;
-    }, {});
 
     return (
         <main className="flex-1 p-6">
@@ -53,149 +58,35 @@ export default function ContentContainer({
                         </h1>
 
                         {selectedSection === "agentUpdates" && !selectedAgent ? (
-                            agentList && agentList.length > 0 ? (
-                                <div
-                                    className="grid gap-2"
-                                    style={{
-                                        gridTemplateColumns: "repeat(auto-fit, minmax(100px, 1fr))",
-                                    }}
-                                >
-                                    {agentList.map((agent, index) => (
-                                        <div
-                                            key={`${agent.name}-${index}`}
-                                            className="flex flex-col items-center p-2 bg-gray-800 rounded-md cursor-pointer hover:bg-red-600 transition-transform transform active:scale-95"
-                                            onClick={() => handleSelectAgent(agent.name)}
-                                            style={{ height: "auto" }}
-                                        >
-                                            <div className="w-16 h-16 flex items-center justify-center mb-1">
-                                                <img
-                                                    src={`/icons/character/${agent.name.toLowerCase()}.png`}
-                                                    alt={`${agent.koreanName} icon`}
-                                                    className="w-full h-full object-contain rounded-full"
-                                                />
-                                            </div>
-                                            <span className="text-md text-center truncate">
-                                                {agent.koreanName}
-                                            </span>
-                                        </div>
-                                    ))}
-                                </div>
-                            ) : (
-                                <p className="text-gray-400">요원 목록을 찾을 수 없습니다.</p>
-                            )
+                            <AgentList
+                                agentList={agentList}
+                                handleSelectAgent={handleSelectAgent}
+                                handleTransition={handleTransition}
+                            />
                         ) : (
-                            <div className="space-y-6">
-                                {selectedAgent && (
-                                    <button
-                                        className="mb-4 px-4 py-2 bg-red-700 hover:bg-red-600 rounded-lg shadow-lg"
-                                        onClick={() =>
-                                            handleTransition(() => {
-                                                handleSelectAgent(null);
-                                                handleShowList();
-                                            })
-                                        }
-                                    >
-                                        돌아가기
-                                    </button>
-                                )}
-
-                                {selectedAgent
-                                    ? patchData.map((note, index) => (
-                                        <div
-                                            key={`${note.id}-${index}`}
-                                            className="p-4 bg-gray-800 rounded-lg shadow-md flex items-start gap-4"
-                                        >
-                                            <img
-                                                src={`/icons/character/${note.agent.toLowerCase()}.png`}
-                                                alt={`${note.agent} icon`}
-                                                className="w-16 h-16 object-cover rounded-full"
-                                            />
-                                            <div>
-                                                <h2 className="text-xl font-semibold text-red-400 mb-2">
-                                                    {note.version}
-                                                </h2>
-                                                <h2 className="text-gray-500 whitespace-pre-wrap italic mb-4">
-                                                    {note.comment}
-                                                </h2>
-                                                <p className="text-gray-200 whitespace-pre-wrap jua-regular">
-                                                    {note.content}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    ))
-                                    : Object.entries(groupedPatches).map(([version, notes]) => (
-                                        <div
-                                            key={version}
-                                            className="p-4 bg-gray-800 rounded-lg shadow-lg hover:bg-gray-700 transition cursor-pointer"
-                                            onClick={() =>
-                                                handleTransition(() =>
-                                                    handleSelectPatch({ version, notes })
-                                                )
-                                            }
-                                        >
-                                            <div className="flex justify-between items-center">
-                                                <h2 className="text-xl font-semibold">{version}</h2>
-                                                <p className="text-gray-400 text-sm">
-                                                    날짜: {notes[0]?.date}
-                                                </p>
-                                            </div>
-                                            <p className="text-gray-400 text-sm italic">
-                                                총 {notes.length}개의 노트
-                                            </p>
-                                        </div>
-                                    ))}
-                            </div>
+                            <PatchList
+                                selectedAgent={selectedAgent}
+                                patchData={patchData}
+                                groupedPatches={patchData.reduce((groups, patch) => {
+                                    if (!groups[patch.version]) {
+                                        groups[patch.version] = [];
+                                    }
+                                    groups[patch.version].push(patch);
+                                    return groups;
+                                }, {})}
+                                handleSelectPatch={handleSelectPatch}
+                                handleTransition={handleTransition}
+                            />
                         )}
                     </div>
-                ) : selectedPost && selectedPost.notes && selectedPost.notes.length > 0 ? (
-                    <div>
-                        <h1 className="text-4xl font-bold text-red-400 mb-4">
-                            {selectedPost.version || selectedPost.agentName}
-                        </h1>
-                        <h2 className="text-gray-300 text-md italic">
-                            {selectedPost.notes[0]?.date || "날짜 정보 없음"}
-                        </h2>
-                        <p className="text-gray-400 text-md mb-6 italic">
-                            총 {selectedPost.notes.length}개의 노트
-                        </p>
-                        <div className="space-y-6">
-                            {selectedPost.notes.map((note, index) => (
-                                <div
-                                    key={`${note.id}-${index}`}
-                                    className="p-4 bg-gray-800 rounded-lg shadow-md flex items-start gap-4"
-                                >
-                                    <img
-                                        src={`/icons/character/${note.agent.toLowerCase()}.png`}
-                                        alt={`${note.agent} icon`}
-                                        className="w-16 h-16 object-cover rounded-full"
-                                    />
-                                    <div>
-                                        <h2 className="text-gray-500 whitespace-pre-wrap italic mb-4">
-                                            {note.comment}
-                                        </h2>
-                                        <p className="text-gray-200 whitespace-pre-wrap jua-regular">
-                                            {note.content}
-                                        </p>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                        <button
-                            className="mt-6 px-4 py-2 bg-red-700 hover:bg-red-600 rounded-lg shadow-lg"
-                            onClick={() =>
-                                handleTransition(() => {
-                                    handleShowList();
-                                    if (selectedSection === "agentUpdates") {
-                                        handleSelectAgent(null);
-                                    }
-                                })
-                            }
-                        >
-                            목록으로 돌아가기
-                        </button>
-                    </div>
                 ) : (
-                    <p className="text-gray-300">항목을 선택하세요.</p>
+                    <PatchDetail
+                        selectedPost={selectedPost}
+                        handleTransition={handleTransition}
+                        handleShowList={handleShowList}
+                        selectedSection={selectedSection}
+                        handleSelectAgent={handleSelectAgent}
+                    />
                 )}
             </div>
         </main>
