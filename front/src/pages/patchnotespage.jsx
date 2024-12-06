@@ -12,67 +12,72 @@ export default function PatchNotesPage() {
     const [agentList, setAgentList] = useState([]);
     const [selectedAgent, setSelectedAgent] = useState(null);
 
-    // 요원 목록 가져오기
     useEffect(() => {
-        fetchAgentList();
-    }, []);
-
-    const fetchAgentList = async () => {
-        try {
-            const response = await fetch("http://localhost:8080/note/list");
-            const data = await response.json();
-            if (data?.data) {
-                setAgentList(data.data);
-            } else {
-                console.error("요원 목록 형식이 잘못되었습니다.", data);
-            }
-        } catch (error) {
-            console.error("요원 목록 가져오기 실패:", error);
+        if (selectedSection) {
+            fetchData(selectedSection, selectedAgent)
+                .then((result) => {
+                    setPatchData(result.content);
+                    setTotalPages(result.totalPages);
+                    setTotalElements(result.totalElements);
+                })
+                .catch((error) => {
+                    console.error("Error initializing data:", error);
+                });
         }
-    };
+    }, [selectedSection, selectedAgent]);
 
-    const fetchData = async (section, agentName = null) => {
-        if (section === "agentUpdates" && !agentName) {
-            console.warn("요원 이름이 제공되지 않았기 때문에 데이터를 불러오지 않습니다.");
-            return;
-        }
 
-        setIsLoading(true);
+    const fetchData = async (section, agentName = null, page = 0) => {
+        console.log("Fetching data for:", { section, agentName, page });
+
         try {
             let url = "";
 
             switch (section) {
                 case "latestPatch":
-                    url = "http://localhost:8080/note?page=0&size=5&condition=newest";
+                    url = `http://localhost:8080/note?page=${page}&size=5&condition=newest`;
                     break;
                 case "upcomingPatch":
-                    url = "http://localhost:8080/note?page=0&size=5&condition=upcomingPatch";
+                    url = `http://localhost:8080/note?page=${page}&size=5&condition=upcomingPatch`;
                     break;
                 case "agentUpdates":
-                    url = `http://localhost:8080/note?page=0&size=5&condition=agent&agentName=${agentName}`;
+                    if (!agentName) {
+                        console.error("Agent name is required for agentUpdates");
+                        return { content: [], totalPages: 1, totalElements: 0 };
+                    }
+                    url = `http://localhost:8080/note?page=${page}&size=5&condition=agent&agentName=${encodeURIComponent(
+                        agentName
+                    )}`;
                     break;
                 default:
                     console.error("Unknown section:", section);
-                    setIsLoading(false);
-                    return;
+                    return { content: [], totalPages: 1, totalElements: 0 };
             }
+
+            console.log("Requesting URL:", url);
 
             const response = await fetch(url);
             const data = await response.json();
 
+            console.log("API Response:", data);
+
             if (data?.data?.content) {
-                setPatchData(data.data.content);
-                setSelectedPost(null);
-                setViewList(true);
+                return {
+                    content: data.data.content,
+                    totalPages: data.data.totalPages || 1,
+                    totalElements: data.data.totalElements || 0, // 전체 노트 수 반환
+                };
             } else {
-                console.error("데이터 형식이 잘못되었습니다.", data);
+                console.error("Unexpected response format:", data);
+                return { content: [], totalPages: 1, totalElements: 0 };
             }
         } catch (error) {
-            console.error("데이터 가져오기 실패:", error);
-        } finally {
-            setIsLoading(false);
+            console.error("Error fetching data:", error);
+            return { content: [], totalPages: 1, totalElements: 0 };
         }
     };
+
+
 
     const handleShowList = () => {
         setViewList(true);
@@ -87,7 +92,6 @@ export default function PatchNotesPage() {
 
     const handleSelectAgent = (agentName) => {
         if (!agentName) {
-            // 요원이 선택되지 않았을 경우 (돌아가기 버튼)
             setSelectedAgent(null);
             setViewList(true);
             return;
@@ -106,11 +110,7 @@ export default function PatchNotesPage() {
                 setSelectedSection={(section) => {
                     setSelectedAgent(null);
                     setSelectedSection(section);
-                    if (section !== "agentUpdates") {
-                        fetchData(section);
-                    } else {
-                        setViewList(false);
-                    }
+                    fetchData(section);
                 }}
                 setViewList={setViewList}
                 isSubMenuOpen={isSubMenuOpen}
@@ -127,6 +127,7 @@ export default function PatchNotesPage() {
                 agentList={agentList}
                 handleSelectAgent={handleSelectAgent}
                 selectedAgent={selectedAgent}
+                fetchData={fetchData} // fetchData 전달
             />
         </div>
     );

@@ -7,6 +7,7 @@ export default function PatchList({
                                       handleSelectPatch,
                                       handleTransition,
                                       handleShowList,
+                                      totalElements, // totalElements 추가
                                   }) {
     return (
         <div className="space-y-6">
@@ -57,7 +58,7 @@ export default function PatchList({
                             <p className="text-gray-400 text-sm">날짜: {notes[0]?.date}</p>
                         </div>
                         <p className="text-gray-400 text-sm italic">
-                            총 {notes.length}개의 노트
+                            총 {totalElements}개의 노트
                         </p>
                     </div>
                 ))}

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import AgentList from "@/components/agentList.jsx";
 import PatchList from "@/components/patchList.jsx";
 import PatchDetail from "@/components/patchDetail.jsx";
@@ -14,8 +14,10 @@ export default function ContentContainer({
                                              agentList,
                                              handleSelectAgent,
                                              selectedAgent,
+                                             fetchData, // fetchData 전달
                                          }) {
     const [isTransitioning, setIsTransitioning] = useState(false);
+    const [totalElements, setTotalElements] = useState(0); // 총 데이터 개수 상태 추가
 
     const handleTransition = (callback) => {
         setIsTransitioning(true);
@@ -24,6 +26,15 @@ export default function ContentContainer({
             setIsTransitioning(false);
         }, 300);
     };
+
+    // 데이터 로드 함수 추가
+    useEffect(() => {
+        const loadData = async () => {
+            const result = await fetchData(selectedSection, selectedAgent);
+            setTotalElements(result.totalElements); // totalElements 업데이트
+        };
+        loadData();
+    }, [selectedSection, selectedAgent]);
 
     return (
         <main className="flex-1 p-6">
@@ -45,7 +56,6 @@ export default function ContentContainer({
                                         ? `${selectedAgent} 업데이트 목록`
                                         : "요원별 업데이트"}
                         </h1>
-
                         {selectedSection === "agentUpdates" && !selectedAgent ? (
                             <AgentList
                                 agentList={agentList}
@@ -66,6 +76,7 @@ export default function ContentContainer({
                                 handleSelectPatch={handleSelectPatch}
                                 handleTransition={handleTransition}
                                 handleShowList={handleShowList}
+                                totalElements={totalElements} // totalElements 전달
                             />
                         )}
                     </div>
@@ -75,7 +86,7 @@ export default function ContentContainer({
                         handleTransition={handleTransition}
                         handleShowList={handleShowList}
                         selectedSection={selectedSection}
-                        handleSelectAgent={handleSelectAgent}
+                        fetchData={fetchData}
                     />
                 )}
             </div>
