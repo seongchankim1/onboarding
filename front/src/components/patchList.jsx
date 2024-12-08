@@ -1,67 +1,63 @@
 import React from "react";
 
 export default function PatchList({
-                                      selectedAgent,
-                                      patchData,
-                                      groupedPatches,
-                                      handleSelectPatch,
+                                      versions,
+                                      handleSelectVersion,
                                       handleTransition,
-                                      handleShowList,
-                                      totalElements, // totalElements 추가
+                                      versionPage,
+                                      setVersionPage,
+                                      totalVersionPages
                                   }) {
+    const safeVersions = versions || [];
+
     return (
         <div className="space-y-6">
-            {/* 요원 선택 후 돌아가기 버튼 추가 */}
-            {selectedAgent && (
-                <button
-                    className="mb-4 px-4 py-2 bg-red-700 hover:bg-red-600 rounded-lg shadow-lg"
-                    onClick={() => handleTransition(() => handleShowList())}
-                >
-                    돌아가기
-                </button>
-            )}
-
-            {selectedAgent
-                ? patchData.map((note, index) => (
+            {safeVersions.length > 0 ? (
+                safeVersions.map((v) => (
                     <div
-                        key={`${note.id}-${index}`}
-                        className="p-4 bg-gray-800 rounded-lg shadow-md flex items-start gap-4"
-                    >
-                        <img
-                            src={`/icons/character/${note.agent.toLowerCase()}.png`}
-                            alt={`${note.agent} icon`}
-                            className="w-16 h-16 object-cover rounded-full"
-                        />
-                        <div>
-                            <h2 className="text-xl font-semibold text-red-400 mb-2">
-                                {note.version}
-                            </h2>
-                            <h2 className="text-gray-500 whitespace-pre-wrap italic mb-4">
-                                {note.comment}
-                            </h2>
-                            <p className="text-gray-200 whitespace-pre-wrap jua-regular">
-                                {note.content}
-                            </p>
-                        </div>
-                    </div>
-                ))
-                : Object.entries(groupedPatches).map(([version, notes]) => (
-                    <div
-                        key={version}
+                        key={v.version}
                         className="p-4 bg-gray-800 rounded-lg shadow-lg hover:bg-gray-700 transition cursor-pointer"
-                        onClick={() =>
-                            handleTransition(() => handleSelectPatch({ version, notes }))
-                        }
+                        onClick={() => handleTransition(() => handleSelectVersion(v.version))}
                     >
-                        <div className="flex justify-between items-center">
-                            <h2 className="text-xl font-semibold">{version}</h2>
-                            <p className="text-gray-400 text-sm">날짜: {notes[0]?.date}</p>
-                        </div>
+                        <h2 className="text-xl font-semibold">{v.version}</h2>
                         <p className="text-gray-400 text-sm italic">
-                            총 {totalElements}개의 노트
+                            총 {v.totalCount}개의 노트
                         </p>
                     </div>
-                ))}
+                ))
+            ) : (
+                <p className="text-gray-400">버전을 찾을 수 없습니다.</p>
+            )}
+
+            {totalVersionPages > 1 && (
+                <div className="flex justify-center items-center mt-4 space-x-2">
+                    <button
+                        onClick={() => setVersionPage(Math.max(versionPage - 1, 0))}
+                        disabled={versionPage === 0}
+                        className="px-4 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 disabled:opacity-50"
+                    >
+                        이전
+                    </button>
+                    {Array.from({ length: totalVersionPages }, (_, index) => (
+                        <button
+                            key={index}
+                            className={`px-4 py-2 rounded-lg ${
+                                versionPage === index ? "bg-red-700" : "bg-gray-700 hover:bg-gray-600"
+                            }`}
+                            onClick={() => setVersionPage(index)}
+                        >
+                            {index + 1}
+                        </button>
+                    ))}
+                    <button
+                        onClick={() => setVersionPage(Math.min(versionPage + 1, totalVersionPages - 1))}
+                        disabled={versionPage === totalVersionPages - 1}
+                        className="px-4 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 disabled:opacity-50"
+                    >
+                        다음
+                    </button>
+                </div>
+            )}
         </div>
     );
 }

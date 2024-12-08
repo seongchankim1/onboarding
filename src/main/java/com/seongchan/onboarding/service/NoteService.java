@@ -12,10 +12,12 @@ import org.springframework.stereotype.Service;
 import com.seongchan.onboarding.dto.AgentResponseDto;
 import com.seongchan.onboarding.dto.NoteResponseDto;
 import com.seongchan.onboarding.dto.NoteRequestDto;
+import com.seongchan.onboarding.dto.VersionItemDto;
 import com.seongchan.onboarding.entity.Agent;
 import com.seongchan.onboarding.entity.Note;
 import com.seongchan.onboarding.entity.Patch;
 import com.seongchan.onboarding.repository.NoteRepository;
+import com.seongchan.onboarding.repository.NoteRepository.VersionCountProjection;
 import com.seongchan.onboarding.repository.PatchRepository;
 
 import jakarta.transaction.Transactional;
@@ -30,15 +32,14 @@ public class NoteService {
 
 	@Transactional
 	public NoteResponseDto create(NoteRequestDto requestDto) {
-
 		Patch patch = Patch.builder()
 			.version(requestDto.getPatchVer())
 			.agent(requestDto.getAgent())
 			.date(LocalDate.now())
 			.build();
 
-		Note note = Note.builder().
-			content(requestDto.getContent())
+		Note note = Note.builder()
+			.content(requestDto.getContent())
 			.comment(requestDto.getComment())
 			.date(requestDto.getDate())
 			.patch(patch)
@@ -50,36 +51,63 @@ public class NoteService {
 	}
 
 	public Page<NoteResponseDto> getNotesWithCondition(int page, int size, String condition, Agent agent) {
-
 		Pageable pageable = PageRequest.of(page, size);
 		Page<Note> notesPage;
 
 		switch (condition) {
-			case "newest": // 최신 날짜 기준
+			case "newest":
 				notesPage = noteRepository.findAllByOrderByDateDesc(pageable);
 				break;
-
-			case "upcomingPatch": // 예정된 패치
+			case "upcomingPatch":
 				notesPage = noteRepository.findExpectedNotes(pageable);
 				break;
-
-			case "agent": // 특정 요원 패치 내역
+			case "agent":
+				if (agent == null) return Page.empty();
 				notesPage = noteRepository.findByAgent(agent, pageable);
 				break;
-
-			default: // 기본: 최신 날짜 기준
-				notesPage = noteRepository.findAllByOrderByDateDesc(pageable);
+			case "byVersion":
+			default:
+				// byVersion은 별도 메서드 사용
+				notesPage = Page.empty();
 				break;
 		}
 
-		// 엔티티를 DTO로 변환하여 반환
 		return notesPage.map(NoteResponseDto::new);
 	}
 
-	// 모든 요원을 반환하는 메서드
+	public Page<NoteResponseDto> getNotesByVersion(int page, int size, String version) {
+		Pageable pageable = PageRequest.of(page, size);
+		Page<Note> notesPage = noteRepository.findNotesByVersion(version, pageable);
+		return notesPage.map(NoteResponseDto::new);
+	}
+
+	// version 목록 + count 가져오기
+	public Page<VersionItemDto> getVersionsWithCondition(int page, int size, String condition, Agent agent) {
+		Pageable pageable = PageRequest.of(page, size);
+		Page<VersionCountProjection> result;
+
+		switch (condition) {
+			case "newest":
+				result = noteRepository.findLatestPatchVersionsWithCount(pageable);
+				break;
+			case "upcomingPatch":
+				result = noteRepository.findUpcomingPatchVersionsWithCount(pageable);
+				break;
+			case "agent":
+				if (agent == null) return Page.empty();
+				result = noteRepository.findAgentPatchVersionsWithCount(agent, pageable);
+				break;
+			default:
+				result = noteRepository.findLatestPatchVersionsWithCount(pageable);
+				break;
+		}
+
+		return result.map(rcp -> new VersionItemDto(rcp.getVersion(), rcp.getCnt()));
+	}
+
 	public List<AgentResponseDto> getAgentList() {
 		return List.of(Agent.values()).stream()
-			.map(agent -> new AgentResponseDto(agent.name(), agent.getKoreanName()))
+			.map(a -> new AgentResponseDto(a.name(), a.getKoreanName()))
 			.collect(Collectors.toList());
 	}
 }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import AgentList from "@/components/agentList.jsx";
 import PatchList from "@/components/patchList.jsx";
 import PatchDetail from "@/components/patchDetail.jsx";
@@ -7,17 +7,22 @@ export default function ContentContainer({
                                              viewList,
                                              selectedSection,
                                              selectedPost,
+                                             versions,
                                              patchData,
                                              isLoading,
                                              handleShowList,
-                                             handleSelectPatch,
+                                             handleSelectVersion,
                                              agentList,
                                              handleSelectAgent,
                                              selectedAgent,
-                                             fetchData, // fetchData 전달
+                                             versionPage,
+                                             setVersionPage,
+                                             totalVersionPages,
+                                             notePage,
+                                             handleNotePageChange,
+                                             totalNotePages
                                          }) {
     const [isTransitioning, setIsTransitioning] = useState(false);
-    const [totalElements, setTotalElements] = useState(0); // 총 데이터 개수 상태 추가
 
     const handleTransition = (callback) => {
         setIsTransitioning(true);
@@ -27,14 +32,12 @@ export default function ContentContainer({
         }, 300);
     };
 
-    // 데이터 로드 함수 추가
-    useEffect(() => {
-        const loadData = async () => {
-            const result = await fetchData(selectedSection, selectedAgent);
-            setTotalElements(result.totalElements); // totalElements 업데이트
-        };
-        loadData();
-    }, [selectedSection, selectedAgent]);
+    const isAgentMode = (selectedSection === "agentUpdates" && selectedAgent);
+
+    let title = "";
+    if (selectedSection === "latestPatch") title = "패치 내역";
+    else if (selectedSection === "upcomingPatch") title = "패치 예정";
+    else if (selectedSection === "agentUpdates" && !selectedAgent) title = "요원별 업데이트";
 
     return (
         <main className="flex-1 p-6">
@@ -47,46 +50,47 @@ export default function ContentContainer({
                     <p className="text-gray-400 text-center">로딩 중...</p>
                 ) : viewList ? (
                     <div>
-                        <h1 className="text-4xl font-bold text-red-400 mb-4">
-                            {selectedSection === "latestPatch"
-                                ? "패치 내역"
-                                : selectedSection === "upcomingPatch"
-                                    ? "패치 예정"
-                                    : selectedAgent
-                                        ? `${selectedAgent} 업데이트 목록`
-                                        : "요원별 업데이트"}
-                        </h1>
+                        {title && <h1 className="text-4xl font-bold text-red-400 mb-4">{title}</h1>}
                         {selectedSection === "agentUpdates" && !selectedAgent ? (
                             <AgentList
                                 agentList={agentList}
                                 handleSelectAgent={handleSelectAgent}
                                 handleTransition={handleTransition}
                             />
-                        ) : (
-                            <PatchList
-                                selectedAgent={selectedAgent}
-                                patchData={patchData}
-                                groupedPatches={patchData.reduce((groups, patch) => {
-                                    if (!groups[patch.version]) {
-                                        groups[patch.version] = [];
-                                    }
-                                    groups[patch.version].push(patch);
-                                    return groups;
-                                }, {})}
-                                handleSelectPatch={handleSelectPatch}
+                        ) : isAgentMode ? (
+                            <PatchDetail
+                                notes={patchData}
                                 handleTransition={handleTransition}
                                 handleShowList={handleShowList}
-                                totalElements={totalElements} // totalElements 전달
+                                selectedSection={selectedSection}
+                                isAgentMode={true}
+                                notePage={notePage}
+                                handleNotePageChange={handleNotePageChange}
+                                totalNotePages={totalNotePages}
+                            />
+                        ) : (
+                            // latestPatch, upcomingPatch일 때 versions 목록 보여주기
+                            <PatchList
+                                versions={versions}
+                                handleSelectVersion={handleSelectVersion}
+                                handleTransition={handleTransition}
+                                versionPage={versionPage}
+                                setVersionPage={setVersionPage}
+                                totalVersionPages={totalVersionPages}
                             />
                         )}
                     </div>
                 ) : (
+                    // selectedPost 있을 때 (byVersion 노트 보기)
                     <PatchDetail
                         selectedPost={selectedPost}
                         handleTransition={handleTransition}
                         handleShowList={handleShowList}
                         selectedSection={selectedSection}
-                        fetchData={fetchData}
+                        isAgentMode={false}
+                        notePage={notePage}
+                        handleNotePageChange={handleNotePageChange}
+                        totalNotePages={totalNotePages}
                     />
                 )}
             </div>
