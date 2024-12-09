@@ -21,7 +21,7 @@ export default function PatchList({
                     >
                         <h2 className="text-xl font-semibold">{v.version}</h2>
                         <p className="text-gray-400 text-sm italic">
-                            총 {v.totalCount}개의 노트
+                            총 {v.totalCount || 0}개의 노트
                         </p>
                     </div>
                 ))
@@ -41,9 +41,7 @@ export default function PatchList({
                     {Array.from({ length: totalVersionPages }, (_, index) => (
                         <button
                             key={index}
-                            className={`px-4 py-2 rounded-lg ${
-                                versionPage === index ? "bg-red-700" : "bg-gray-700 hover:bg-gray-600"
-                            }`}
+                            className={`px-4 py-2 rounded-lg ${versionPage === index ? "bg-red-700" : "bg-gray-700 hover:bg-gray-600"}`}
                             onClick={() => setVersionPage(index)}
                         >
                             {index + 1}

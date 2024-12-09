@@ -1,7 +1,11 @@
-import React, { useState } from "react";
-import AgentList from "@/components/agentList.jsx";
-import PatchList from "@/components/patchList.jsx";
-import PatchDetail from "@/components/patchDetail.jsx";
+// ContentContainer.jsx
+import React from "react";
+import PatchDetail from "./patchDetail.jsx";
+import AgentList from "./agentList.jsx";
+import MapList from "./mapList.jsx";
+import WeaponList from "./weaponList.jsx";
+import OtherList from "./otherList.jsx";
+import PatchList from "./patchList.jsx";
 
 export default function ContentContainer({
                                              viewList,
@@ -9,41 +13,42 @@ export default function ContentContainer({
                                              selectedPost,
                                              versions,
                                              patchData,
+                                             agentList,
+                                             itemList,
+                                             selectedAgent,
+                                             selectedMap,
+                                             selectedWeapon,
+                                             selectedOther,
                                              isLoading,
                                              handleShowList,
-                                             handleSelectVersion,
-                                             agentList,
                                              handleSelectAgent,
-                                             selectedAgent,
+                                             handleSelectVersion,
+                                             handleSelectMap,
+                                             handleSelectWeapon,
+                                             handleSelectOther,
                                              versionPage,
                                              setVersionPage,
                                              totalVersionPages,
                                              notePage,
                                              handleNotePageChange,
-                                             totalNotePages
+                                             totalNotePages,
+                                             totalNotes,
+                                             handleTransition,
+                                             handleSelectNote
                                          }) {
-    const [isTransitioning, setIsTransitioning] = useState(false);
-
-    const handleTransition = (callback) => {
-        setIsTransitioning(true);
-        setTimeout(() => {
-            callback();
-            setIsTransitioning(false);
-        }, 300);
-    };
-
-    const isAgentMode = (selectedSection === "agentUpdates" && selectedAgent);
-
     let title = "";
     if (selectedSection === "latestPatch") title = "패치 내역";
     else if (selectedSection === "upcomingPatch") title = "패치 예정";
     else if (selectedSection === "agentUpdates" && !selectedAgent) title = "요원별 업데이트";
+    else if (selectedSection === "mapUpdates" && !selectedMap) title = "맵별 업데이트";
+    else if (selectedSection === "weaponUpdates" && !selectedWeapon) title = "무기별 업데이트";
+    else if (selectedSection === "otherUpdates" && !selectedOther) title = "기타 업데이트";
 
     return (
         <main className="flex-1 p-6">
             <div
                 className={`bg-gray-900 p-8 rounded-3xl shadow-2xl transition-all duration-500 ease-out transform ${
-                    isTransitioning ? "opacity-0 scale-95" : "opacity-100 scale-100"
+                    false ? "opacity-0 scale-95" : "opacity-100 scale-100"
                 }`}
             >
                 {isLoading ? (
@@ -57,7 +62,7 @@ export default function ContentContainer({
                                 handleSelectAgent={handleSelectAgent}
                                 handleTransition={handleTransition}
                             />
-                        ) : isAgentMode ? (
+                        ) : selectedSection === "agentUpdates" && selectedAgent ? (
                             <PatchDetail
                                 notes={patchData}
                                 handleTransition={handleTransition}
@@ -67,9 +72,63 @@ export default function ContentContainer({
                                 notePage={notePage}
                                 handleNotePageChange={handleNotePageChange}
                                 totalNotePages={totalNotePages}
+                                totalNotes={totalNotes}
+                            />
+                        ) : selectedSection === "mapUpdates" && !selectedMap ? (
+                            <MapList
+                                mapList={itemList}
+                                handleSelectMap={handleSelectMap}
+                                handleTransition={handleTransition}
+                            />
+                        ) : selectedSection === "mapUpdates" && selectedMap ? (
+                            <PatchDetail
+                                notes={patchData}
+                                handleTransition={handleTransition}
+                                handleShowList={handleShowList}
+                                selectedSection={selectedSection}
+                                isAgentMode={true}
+                                notePage={notePage}
+                                handleNotePageChange={handleNotePageChange}
+                                totalNotePages={totalNotePages}
+                                totalNotes={totalNotes}
+                            />
+                        ) : selectedSection === "weaponUpdates" && !selectedWeapon ? (
+                            <WeaponList
+                                weaponList={itemList}
+                                handleSelectWeapon={handleSelectWeapon}
+                                handleTransition={handleTransition}
+                            />
+                        ) : selectedSection === "weaponUpdates" && selectedWeapon ? (
+                            <PatchDetail
+                                notes={patchData}
+                                handleTransition={handleTransition}
+                                handleShowList={handleShowList}
+                                selectedSection={selectedSection}
+                                isAgentMode={true}
+                                notePage={notePage}
+                                handleNotePageChange={handleNotePageChange}
+                                totalNotePages={totalNotePages}
+                                totalNotes={totalNotes}
+                            />
+                        ) : selectedSection === "otherUpdates" && !selectedOther ? (
+                            <OtherList
+                                otherList={itemList}
+                                handleSelectOther={handleSelectOther}
+                                handleTransition={handleTransition}
+                            />
+                        ) : selectedSection === "otherUpdates" && selectedOther ? (
+                            <PatchDetail
+                                notes={patchData}
+                                handleTransition={handleTransition}
+                                handleShowList={handleShowList}
+                                selectedSection={selectedSection}
+                                isAgentMode={true}
+                                notePage={notePage}
+                                handleNotePageChange={handleNotePageChange}
+                                totalNotePages={totalNotePages}
+                                totalNotes={totalNotes}
                             />
                         ) : (
-                            // latestPatch, upcomingPatch일 때 versions 목록 보여주기
                             <PatchList
                                 versions={versions}
                                 handleSelectVersion={handleSelectVersion}
@@ -81,7 +140,6 @@ export default function ContentContainer({
                         )}
                     </div>
                 ) : (
-                    // selectedPost 있을 때 (byVersion 노트 보기)
                     <PatchDetail
                         selectedPost={selectedPost}
                         handleTransition={handleTransition}
@@ -91,6 +149,7 @@ export default function ContentContainer({
                         notePage={notePage}
                         handleNotePageChange={handleNotePageChange}
                         totalNotePages={totalNotePages}
+                        totalNotes={totalNotes}
                     />
                 )}
             </div>

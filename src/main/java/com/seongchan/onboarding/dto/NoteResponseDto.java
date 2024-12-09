@@ -2,7 +2,6 @@ package com.seongchan.onboarding.dto;
 
 import java.time.LocalDate;
 
-import com.seongchan.onboarding.entity.Agent;
 import com.seongchan.onboarding.entity.Note;
 
 import lombok.Getter;
@@ -11,19 +10,30 @@ import lombok.Getter;
 public class NoteResponseDto {
 
 	private Long id;
-	private String comment;
 	private String content;
-	private LocalDate date;
-	private Agent agent; // 연결된 Agent 이름
+	private String comment;
+	private LocalDate patchDate;
 	private String version;
+	private String agent;
+	private String map;
+	private String weapon;
+	private String other;
 
-	// Note를 받아서 DTO를 생성하는 생성자
+	public NoteResponseDto() {}
+
 	public NoteResponseDto(Note note) {
 		this.id = note.getId();
-		this.comment = note.getComment();
 		this.content = note.getContent();
-		this.date = note.getDate();
-		this.agent = note.getPatch().getAgent();
+		this.comment = note.getComment();
+		this.patchDate = note.getPatch().getDate();
 		this.version = note.getPatch().getVersion();
+		// agent 설정
+		this.agent = note.getPatch().getAgent() != null ? note.getPatch().getAgent().name().toLowerCase() : null;
+		// map 설정
+		this.map = note.getPatch().getMap() != null ? note.getPatch().getMap().name().toLowerCase() : null;
+		// weapon 설정
+		this.weapon = note.getPatch().getWeapon() != null ? note.getPatch().getWeapon().name().toLowerCase() : null;
+		// other 설정
+		this.other = note.getPatch().getOther() != null ? note.getPatch().getOther().name().toLowerCase() : null;
 	}
 }

@@ -7,38 +7,63 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.seongchan.onboarding.entity.Agent;
+import com.seongchan.onboarding.entity.Map;
+import com.seongchan.onboarding.entity.Weapon;
+import com.seongchan.onboarding.entity.Other;
 import com.seongchan.onboarding.entity.Note;
 
 public interface NoteRepository extends JpaRepository<Note, Long> {
 
-	// 최신 패치(과거)
-	@Query("SELECT n FROM Note n WHERE n.date <= CURRENT_DATE ORDER BY n.date DESC")
+	// 기본 최신, 예정 쿼리
+	@Query("SELECT n FROM Note n WHERE n.patch.date <= CURRENT_TIMESTAMP ORDER BY n.patch.date DESC")
 	Page<Note> findAllByOrderByDateDesc(Pageable pageable);
 
-	// 예정된 패치(미래)
-	@Query("SELECT n FROM Note n WHERE n.date > CURRENT_DATE ORDER BY n.date ASC")
+	@Query("SELECT n FROM Note n WHERE n.patch.date > CURRENT_TIMESTAMP ORDER BY n.patch.date ASC")
 	Page<Note> findExpectedNotes(Pageable pageable);
 
-	// 특정 요원
-	@Query("SELECT n FROM Note n JOIN n.patch p WHERE p.agent = :agent ORDER BY n.date DESC")
+	// Agent 필터
+	@Query("SELECT n FROM Note n JOIN n.patch p WHERE p.agent = :agent ORDER BY p.date DESC")
 	Page<Note> findByAgent(@Param("agent") Agent agent, Pageable pageable);
 
-	// 특정 버전
-	@Query("SELECT n FROM Note n JOIN n.patch p WHERE p.version = :version ORDER BY n.date DESC")
+	@Query("SELECT n FROM Note n JOIN n.patch p WHERE p.version = :version ORDER BY p.date DESC")
 	Page<Note> findNotesByVersion(@Param("version") String version, Pageable pageable);
 
-	// distinct version 목록 + totalCount 구하기 위한 쿼리들
-	// 최신 패치 버전 목록
-	@Query("SELECT p.version as version, COUNT(n) as cnt FROM Note n JOIN n.patch p WHERE n.date <= CURRENT_DATE GROUP BY p.version ORDER BY MAX(p.date) DESC")
+	// Map 전용 조건
+	@Query("SELECT n FROM Note n JOIN n.patch p WHERE p.map = :map ORDER BY p.date DESC")
+	Page<Note> findByMap(@Param("map") Map map, Pageable pageable);
+
+	@Query("SELECT n FROM Note n JOIN n.patch p WHERE p.map = :map AND p.date > CURRENT_TIMESTAMP ORDER BY p.date ASC")
+	Page<Note> findExpectedNotesForMap(@Param("map") Map map, Pageable pageable);
+
+	@Query("SELECT n FROM Note n JOIN n.patch p WHERE p.map = :map AND p.date <= CURRENT_TIMESTAMP ORDER BY p.date DESC")
+	Page<Note> findAllByDateDescForMap(@Param("map") Map map, Pageable pageable);
+
+	// Weapon 전용 조건
+	@Query("SELECT n FROM Note n JOIN n.patch p WHERE p.weapon = :weapon ORDER BY p.date DESC")
+	Page<Note> findByWeapon(@Param("weapon") Weapon weapon, Pageable pageable);
+
+	@Query("SELECT n FROM Note n JOIN n.patch p WHERE p.weapon = :weapon AND p.date > CURRENT_TIMESTAMP ORDER BY p.date ASC")
+	Page<Note> findExpectedNotesForWeapon(@Param("weapon") Weapon weapon, Pageable pageable);
+
+	@Query("SELECT n FROM Note n JOIN n.patch p WHERE p.weapon = :weapon AND p.date <= CURRENT_TIMESTAMP ORDER BY p.date DESC")
+	Page<Note> findAllByDateDescForWeapon(@Param("weapon") Weapon weapon, Pageable pageable);
+
+	// Other 전용 조건
+	@Query("SELECT n FROM Note n JOIN n.patch p WHERE p.other = :other ORDER BY p.date DESC")
+	Page<Note> findByOther(@Param("other") Other other, Pageable pageable);
+
+	@Query("SELECT n FROM Note n JOIN n.patch p WHERE p.other = :other AND p.date > CURRENT_TIMESTAMP ORDER BY p.date ASC")
+	Page<Note> findExpectedNotesForOther(@Param("other") Other other, Pageable pageable);
+
+	@Query("SELECT n FROM Note n JOIN n.patch p WHERE p.other = :other AND p.date <= CURRENT_TIMESTAMP ORDER BY p.date DESC")
+	Page<Note> findAllByDateDescForOther(@Param("other") Other other, Pageable pageable);
+
+	@Query("SELECT p.version as version, COUNT(n) as cnt FROM Note n JOIN n.patch p WHERE p.date <= CURRENT_TIMESTAMP GROUP BY p.version ORDER BY MAX(p.date) DESC")
 	Page<VersionCountProjection> findLatestPatchVersionsWithCount(Pageable pageable);
 
-	// 예정 패치 버전 목록
-	@Query("SELECT p.version as version, COUNT(n) as cnt FROM Note n JOIN n.patch p WHERE n.date > CURRENT_DATE GROUP BY p.version ORDER BY MAX(p.date) ASC")
+	@Query("SELECT p.version as version, COUNT(n) as cnt FROM Note n JOIN n.patch p WHERE p.date > CURRENT_TIMESTAMP GROUP BY p.version ORDER BY MAX(p.date) ASC")
 	Page<VersionCountProjection> findUpcomingPatchVersionsWithCount(Pageable pageable);
 
-	// 요원별 패치 버전 목록
-	@Query("SELECT p.version as version, COUNT(n) as cnt FROM Note n JOIN n.patch p WHERE p.agent = :agent GROUP BY p.version ORDER BY MAX(p.date) DESC")
-	Page<VersionCountProjection> findAgentPatchVersionsWithCount(@Param("agent") Agent agent, Pageable pageable);
 
 	interface VersionCountProjection {
 		String getVersion();

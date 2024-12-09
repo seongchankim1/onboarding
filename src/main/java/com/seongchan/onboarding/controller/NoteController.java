@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import com.seongchan.onboarding.common.PageableResponse;
 import com.seongchan.onboarding.common.ResponseUtils;
 import com.seongchan.onboarding.dto.HttpResponseDto;
+import com.seongchan.onboarding.dto.ItemResponseDto;
 import com.seongchan.onboarding.dto.NoteRequestDto;
 import com.seongchan.onboarding.dto.NoteResponseDto;
 import com.seongchan.onboarding.dto.VersionItemDto;
@@ -32,51 +33,47 @@ public class NoteController {
 		return ResponseUtils.of(NOTE_CREATE_SUCCESS, responseDto);
 	}
 
-	@GetMapping("/versions")
-	public ResponseEntity<HttpResponseDto> getVersions(
-		@RequestParam("page") int page,
-		@RequestParam("size") int size,
-		@RequestParam String condition,
-		@RequestParam(required = false) String agentName
-	) {
-		Agent agent = null;
-		if (agentName != null) {
-			agent = Agent.valueOf(agentName.toUpperCase());
-		}
-
-		Page<VersionItemDto> versions = noteService.getVersionsWithCondition(page, size, condition, agent);
-		PageableResponse<VersionItemDto> responseEntity = new PageableResponse<>(versions);
-		return ResponseUtils.of(NOTE_GET_SUCCESS, responseEntity);
-	}
-
 	@GetMapping
 	public ResponseEntity<HttpResponseDto> getNote(
 		@RequestParam("page") int page,
 		@RequestParam("size") int size,
 		@RequestParam String condition,
 		@RequestParam(required = false) String agentName,
-		@RequestParam(required = false) String version
+		@RequestParam(required = false) String version,
+		@RequestParam(required = false) String mapName,
+		@RequestParam(required = false) String weaponName,
+		@RequestParam(required = false) String otherType
 	) {
 		Agent agent = null;
 		if (agentName != null) {
-			agent = Agent.valueOf(agentName.toUpperCase());
+			try {
+				agent = Agent.valueOf(agentName.toUpperCase());
+			} catch (Exception e) {
+				agent = null;
+			}
 		}
 
-		Page<NoteResponseDto> responseDto;
-		if ("byVersion".equals(condition) && version != null) {
-			responseDto = noteService.getNotesByVersion(page, size, version);
-		} else {
-			responseDto = noteService.getNotesWithCondition(page, size, condition, agent);
-		}
-
+		Page<NoteResponseDto> responseDto = noteService.getNotesWithConditions(page, size, condition, agent, version, mapName, weaponName, otherType);
 		PageableResponse<NoteResponseDto> responseEntity = new PageableResponse<>(responseDto);
 		return ResponseUtils.of(NOTE_GET_SUCCESS, responseEntity);
 	}
 
 	@GetMapping("/list")
-	public ResponseEntity<HttpResponseDto> getAgentList() {
-		// 불필요한 map 과정 제거, noteService.getAgentList() 자체가 List<AgentResponseDto>를 반환함
-		return ResponseUtils.of(AGENT_LIST_GET_SUCCESS, noteService.getAgentList());
+	public ResponseEntity<HttpResponseDto> getList(@RequestParam String type) {
+		// type = agent, map, weapon, other 에 따라 목록 반환
+		List<ItemResponseDto> list = noteService.getListByType(type);
+		return ResponseUtils.of(AGENT_LIST_GET_SUCCESS, list);
+	}
+
+	@GetMapping("/versions")
+	public ResponseEntity<HttpResponseDto> getVersions(
+		@RequestParam("page") int page,
+		@RequestParam("size") int size,
+		@RequestParam String condition
+	) {
+		Page<VersionItemDto> versions = noteService.getVersionsWithCondition(page, size, condition);
+		PageableResponse<VersionItemDto> responseEntity = new PageableResponse<>(versions);
+		return ResponseUtils.of(NOTE_GET_SUCCESS, responseEntity);
 	}
 
 }
