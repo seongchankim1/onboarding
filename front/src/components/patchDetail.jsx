@@ -1,5 +1,8 @@
-// PatchDetail.jsx
+// src/components/PatchDetail.jsx
 import React from "react";
+import { agentDisplayNames } from "../data/agentDisplayNames";
+import { mapDisplayNames } from "../data/mapDisplayNames";
+import { weaponDisplayNames } from "../data/weaponDisplayNames";
 
 export default function PatchDetail({
                                         selectedPost,
@@ -39,11 +42,12 @@ export default function PatchDetail({
 
     // 아이콘 로딩 로직 수정
     const getIconPaths = (note) => {
+        console.log("Note data for icon:", note); // 디버깅용 로그
         let paths = [];
         if (!isAgentMode) {
             // byVersion 모드: agent, map, weapon, other 아이콘 모두 표시
             if (note.agent) {
-                paths.push(`/icons/character/${note.agent.toLowerCase()}.png`);
+                paths.push(`/icons/agent/${note.agent.toLowerCase()}.png`);
             }
             if (note.map) {
                 paths.push(`/icons/map/${note.map.toLowerCase()}.png`);
@@ -55,12 +59,12 @@ export default function PatchDetail({
                 paths.push(`/icons/other/${note.other.toLowerCase()}.png`);
             }
             if (paths.length === 0) {
-                paths.push(`/icons/character/unknown.png`);
+                paths.push(`/icons/agent/unknown.png`);
             }
         } else {
             // agentUpdates, mapUpdates, weaponUpdates, otherUpdates 모드
             if (selectedSection === "agentUpdates" && note.agent) {
-                paths.push(`/icons/character/${note.agent.toLowerCase()}.png`);
+                paths.push(`/icons/agent/${note.agent.toLowerCase()}.png`);
             }
             if (selectedSection === "mapUpdates" && note.map) {
                 paths.push(`/icons/map/${note.map.toLowerCase()}.png`);
@@ -72,10 +76,26 @@ export default function PatchDetail({
                 paths.push(`/icons/other/${note.other.toLowerCase()}.png`);
             }
             if (paths.length === 0) {
-                paths.push(`/icons/character/unknown.png`);
+                paths.push(`/icons/agent/unknown.png`);
             }
         }
         return paths;
+    };
+
+    // 한글 이름 매핑 함수
+    const getDisplayName = (type, name) => {
+        switch (type) {
+            case "agent":
+                return agentDisplayNames[name] || name;
+            case "map":
+                return mapDisplayNames[name] || name;
+            case "weapon":
+                return weaponDisplayNames[name] || name;
+            case "other":
+                return name; // 기타 항목은 한글 매핑이 필요 없다면 그대로 반환
+            default:
+                return name;
+        }
     };
 
     return hasNotes ? (
@@ -89,7 +109,7 @@ export default function PatchDetail({
             {!isAgentMode && detailNotes[0] && (
                 <>
                     <h2 className="text-gray-300 text-md italic">
-                        {detailNotes[0]?.patchDate || "날짜 정보 없음"}
+                        {new Date(detailNotes[0]?.patchDate).toLocaleString() || "날짜 정보 없음"}
                     </h2>
                     <p className="text-gray-400 text-md mb-6 italic">
                         총 {totalCount}개의 패치노트
@@ -114,18 +134,18 @@ export default function PatchDetail({
                                 <img
                                     key={idx}
                                     src={path}
-                                    alt="icon"
-                                    className="w-16 h-16 object-cover rounded-full"
+                                    alt={getDisplayName(getIconType(path), path.split("/")[2].split(".")[0].toUpperCase())}
+                                    className="w-24 h-24 object-contain"
                                 />
                             ))}
                         </div>
-                        <div>
+                        <div className="flex flex-col">
                             {isAgentMode && (
                                 <p className="text-red-400 text-sm mb-1">
-                                    {note.version} | {note.patchDate}
+                                    {note.version} | {new Date(note.patchDate).toLocaleString()}
                                 </p>
                             )}
-                            <h2 className="text-gray-500 whitespace-pre-wrap italic mb-4">
+                            <h2 className="text-gray-500 whitespace-pre-wrap italic mb-2">
                                 {note.comment}
                             </h2>
                             <p className="text-gray-200 whitespace-pre-wrap">
@@ -179,3 +199,12 @@ export default function PatchDetail({
         <p className="text-gray-300">노트를 불러오지 못했습니다.</p>
     );
 }
+
+// Helper function to determine the type based on the icon path
+const getIconType = (path) => {
+    if (path.includes("/agent/")) return "agent";
+    if (path.includes("/map/")) return "map";
+    if (path.includes("/weapon/")) return "weapon";
+    if (path.includes("/other/")) return "other";
+    return "unknown";
+};

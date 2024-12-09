@@ -1,11 +1,11 @@
-// ContentContainer.jsx
+// src/components/ContentContainer.jsx
 import React from "react";
-import PatchDetail from "./patchDetail.jsx";
-import AgentList from "./agentList.jsx";
-import MapList from "./mapList.jsx";
-import WeaponList from "./weaponList.jsx";
-import OtherList from "./otherList.jsx";
-import PatchList from "./patchList.jsx";
+import PatchDetail from "./PatchDetail.jsx";
+import AgentList from "./AgentList.jsx";
+import MapList from "./MapList.jsx";
+import WeaponList from "./WeaponList.jsx";
+import OtherList from "./OtherList.jsx"; // 기타 업데이트 리스트가 필요하면 유사하게 수정
+import PatchList from "./PatchList.jsx";
 
 export default function ContentContainer({
                                              viewList,
@@ -55,13 +55,9 @@ export default function ContentContainer({
                     <p className="text-gray-400 text-center">로딩 중...</p>
                 ) : viewList ? (
                     <div>
-                        {title && <h1 className="text-4xl font-bold text-red-400 mb-4">{title}</h1>}
+                        {title && <h1 className="text-4xl font-bold text-red-400 mb-8">{title}</h1>}
                         {selectedSection === "agentUpdates" && !selectedAgent ? (
-                            <AgentList
-                                agentList={agentList}
-                                handleSelectAgent={handleSelectAgent}
-                                handleTransition={handleTransition}
-                            />
+                            <AgentList handleSelectAgent={handleSelectAgent} />
                         ) : selectedSection === "agentUpdates" && selectedAgent ? (
                             <PatchDetail
                                 notes={patchData}
@@ -75,11 +71,7 @@ export default function ContentContainer({
                                 totalNotes={totalNotes}
                             />
                         ) : selectedSection === "mapUpdates" && !selectedMap ? (
-                            <MapList
-                                mapList={itemList}
-                                handleSelectMap={handleSelectMap}
-                                handleTransition={handleTransition}
-                            />
+                            <MapList handleSelectMap={handleSelectMap} />
                         ) : selectedSection === "mapUpdates" && selectedMap ? (
                             <PatchDetail
                                 notes={patchData}
@@ -93,11 +85,7 @@ export default function ContentContainer({
                                 totalNotes={totalNotes}
                             />
                         ) : selectedSection === "weaponUpdates" && !selectedWeapon ? (
-                            <WeaponList
-                                weaponList={itemList}
-                                handleSelectWeapon={handleSelectWeapon}
-                                handleTransition={handleTransition}
-                            />
+                            <WeaponList handleSelectWeapon={handleSelectWeapon} />
                         ) : selectedSection === "weaponUpdates" && selectedWeapon ? (
                             <PatchDetail
                                 notes={patchData}
@@ -111,11 +99,7 @@ export default function ContentContainer({
                                 totalNotes={totalNotes}
                             />
                         ) : selectedSection === "otherUpdates" && !selectedOther ? (
-                            <OtherList
-                                otherList={itemList}
-                                handleSelectOther={handleSelectOther}
-                                handleTransition={handleTransition}
-                            />
+                            <OtherList handleSelectOther={handleSelectOther} />
                         ) : selectedSection === "otherUpdates" && selectedOther ? (
                             <PatchDetail
                                 notes={patchData}

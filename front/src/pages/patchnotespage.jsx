@@ -1,7 +1,7 @@
-// PatchNotesPage.jsx
+// src/pages/PatchNotesPage.jsx
 import React, { useState, useEffect } from "react";
-import Sidebar from "../components/sidebar.jsx";
-import ContentContainer from "../components/contentcontainer.jsx";
+import Sidebar from "../components/Sidebar.jsx";
+import ContentContainer from "../components/ContentContainer.jsx";
 
 export default function PatchNotesPage() {
     const [selectedSection, setSelectedSection] = useState("latestPatch");

@@ -1,34 +1,37 @@
+// src/components/AgentList.jsx
 import React from "react";
+import { agentCategories } from "../data/agentCategories";
+import { agentDisplayNames } from "../data/agentDisplayNames";
 
-export default function AgentList({ agentList, handleSelectAgent, handleTransition }) {
+export default function AgentList({ handleSelectAgent }) {
     return (
-        agentList && agentList.length > 0 ? (
-            <div
-                className="grid gap-2"
-                style={{ gridTemplateColumns: "repeat(auto-fit, minmax(100px, 1fr))" }}
-            >
-                {agentList.map((agent, index) => (
-                    <div
-                        key={`${agent.name}-${index}`}
-                        className="flex flex-col items-center p-2 bg-gray-800 rounded-md cursor-pointer hover:bg-red-600 transition-transform transform active:scale-95"
-                        onClick={() => handleTransition(() => handleSelectAgent(agent.name))}
-                        style={{ height: "auto" }}
-                    >
-                        <div className="w-16 h-16 flex items-center justify-center mb-1">
-                            <img
-                                src={`/icons/character/${agent.name.toLowerCase()}.png`}
-                                alt={`${agent.displayName} icon`}
-                                className="w-full h-full object-contain rounded-full"
-                            />
-                        </div>
-                        <span className="text-md text-center truncate">
-                            {agent.displayName}
-                        </span>
+        <div>
+            {Object.entries(agentCategories).map(([category, agents]) => (
+                <div key={category} className="mb-4">
+                    <h3 className="text-lg font-semibold text-red-400 mb-2">{category}</h3>
+                    {/* Flexbox 레이아웃을 사용하여 유동적인 카드 배치 */}
+                    <div className="flex flex-wrap gap-2">
+                        {agents.map((agent) => (
+                            <div
+                                key={agent}
+                                className="bg-gray-700 rounded-md cursor-pointer hover:bg-red-600 flex flex-col items-center p-2 transition-transform transform hover:scale-105 w-[120px]"
+                                onClick={() => handleSelectAgent(agent)}
+                            >
+                                {/* 이미지 컨테이너 비율 유지 및 크기 조정 */}
+                                <div className="w-12 h-12 aspect-square flex items-center justify-center mb-1">
+                                    <img
+                                        src={`/icons/agent/${agent.toLowerCase()}.png`}
+                                        alt={agentDisplayNames[agent]}
+                                        className="w-full h-full object-contain"
+                                    />
+                                </div>
+                                {/* 텍스트 크기 조정 */}
+                                <span className="text-center text-xs font-medium">{agentDisplayNames[agent]}</span>
+                            </div>
+                        ))}
                     </div>
-                ))}
-            </div>
-        ) : (
-            <p className="text-gray-400">요원 목록을 찾을 수 없습니다.</p>
-        )
+                </div>
+            ))}
+        </div>
     );
 }

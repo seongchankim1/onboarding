@@ -12,11 +12,13 @@ public enum Agent {
 	CHAMBER("체임버"),
 	CLOVE("클로브"),
 	CYPHER("사이퍼"),
+	DEADLOCK("데드록"),
 	FADE("페이드"),
 	GEKKO("게코"),
 	HARBOR("하버"),
 	ISO("아이소"),
 	JETT("제트"),
+	KAYO("케이오"),
 	KILLJOY("킬조이"),
 	NEON("네온"),
 	OMEN("오멘"),
@@ -28,8 +30,6 @@ public enum Agent {
 	SOVA("소바"),
 	VIPER("바이퍼"),
 	YORU("요루");
-
-
 
 	private final String koreanName;
 }
